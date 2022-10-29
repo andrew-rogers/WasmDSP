@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+    </head>
+    <body>
+        <script>
+
+// TODO Create a tool to insert this.
+var wasm_b64 = `
+AGFzbQEAAAABCgJgAABgAn9/AX8DAwIAAQQFAXABAQEFAwEAAgYrB38BQYCIBAt/AEGACAt/AEGA
+CAt/AEGACAt/AEGAiAQLfwBBAAt/AEEBCwd9CQZtZW1vcnkCABFfX3dhc21fY2FsbF9jdG9ycwAA
+A2FkZAABDF9fZHNvX2hhbmRsZQMBCl9fZGF0YV9lbmQDAg1fX2dsb2JhbF9iYXNlAwMLX19oZWFw
+X2Jhc2UDBA1fX21lbW9yeV9iYXNlAwUMX190YWJsZV9iYXNlAwYKDwICAAsKACAAIAFqQQNqCwAg
+BG5hbWUBGQIAEV9fd2FzbV9jYWxsX2N0b3JzAQNhZGQALwlwcm9kdWNlcnMBDHByb2Nlc3NlZC1i
+eQEMRGViaWFuIGNsYW5nCDExLjAuMS0y
+`;
+
+var wasm_compile = function(b64, callback){
+    var wasm_buffer = Uint8Array.from(atob(b64), c => c.charCodeAt(0)).buffer;
+    WebAssembly.compile(wasm_buffer).then(wasm => {
+        var wasm_instance = new WebAssembly.Instance(wasm);
+        callback(wasm_instance);
+    });
+};
+
+wasm_compile(wasm_b64,function(module){
+    alert("2+6+3="+module.exports.add(2,6));
+});
+
+        </script>
+    </body>
+</html>

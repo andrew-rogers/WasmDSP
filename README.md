@@ -1,5 +1,5 @@
-Compile DSP blocks written in C/C++ into a single JavaScript file.
-==================================================================
+Compile DSP blocks written in C/C++ and embed into a single HTML file.
+======================================================================
 
 The C/C++ source code is compiled into wasm using clang. The wasm binary is then converted to base64 allowing it to be integrated into the JavaScript source or HTML page. This makes it easy to generate static web pages incorporating the DSP blocks without the need for a server for the wasm binary files.
 
@@ -14,7 +14,7 @@ It is very convenient to understand and teach DSP principles using vector space 
 
 ### Disadvantages of Linear Algebra Tools
 
-It can be easy to loose sight of the real-time constraints of real world DSP applications. This results in a significant real-time system development time as often the real-time constraints will require many adaptations to the initial concepts derived using the linear algebra tools.
+It can be easy to lose sight of the real-time constraints of real world DSP applications. This results in a significant real-time system development time as often the real-time constraints will require many adaptations to the initial concepts derived using the linear algebra tools.
 
 ### Hybrid Approach
 
@@ -23,4 +23,13 @@ Real-time DSP blocks written in C/C++ can be either compiled for the target micr
 Demonstration and Teaching
 --------------------------
 
-Whether for team communication in industry or for teaching in educational environments, it is desirable to be able to demonstrate the principles of the DSP system to others. It is desirable to do this without requiring the audience to have access to the real-time electronics and ideally without requiring them to install specialist software or linear algebra tools. [AndrewWIDE](https://github.com/andrew-rogers/AndrewWIDE) achieves this but has a very heavy focus on the presentation (in the browser) aspects. AndrewWIDE did not adequately define a block interface and relies heavily on JSON to communicate between C++ and the browser. WasmDSP intends to separate this concern and allow a block interface to be used in other JavaScript projects.
+Whether for team communication in industry or for teaching in educational environments, it is desirable to be able to demonstrate the principles of the DSP system to others. It is desirable to do this without requiring the audience to have access to the real-time electronics and ideally without requiring them to install specialist software or linear algebra tools. [AndrewWIDE](https://github.com/andrew-rogers/AndrewWIDE) achieves this but has a very heavy focus on the presentation (in the browser) aspects. AndrewWIDE did not adequately define a block interface and relies heavily on JSON to communicate between C++ and the browser. WasmDSP intends to separate this concern and allow a block interface to be used in AndrewWIDE and other JavaScript projects such as [JupyterLite](https://jupyterlite.readthedocs.io/en/latest/).
+
+What WasmDSP Provides
+---------------------
+
+There are two main parts to WasmDSP.
+
+* Building the wasm binary and embedding this into a JavaScript element in the HTML file.
+* JavaScript API providing access to DSP blocks in the wasm binary.
+

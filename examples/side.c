@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 // Chrome won't allow synchronous wasm compile when larger than 4kB
-#define SIZE 2000
+#define SIZE 5000
 char dummy[SIZE] = {};
 
 void greet(const char* name)

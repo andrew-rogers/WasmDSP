@@ -9,7 +9,9 @@ int main()
     
     printf("Main says hello!\n");
 
-    handle = dlopen("./side.wasm", RTLD_LAZY);
+    // Filename of "/side.so" needs the "/" as it has to exactly match a key in
+    // the JS preloadedWasm array.
+    handle = dlopen("/side.so", RTLD_LAZY);
     
     if (!handle) {
         /* fail to load the side module */

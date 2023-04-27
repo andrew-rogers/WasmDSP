@@ -27,35 +27,81 @@
 
 // http://www.adequatelygood.com/JavaScript-Module-Pattern-In-Depth.html
 
+var WasmDSP = WasmDSP || {};
+
 var WasmDSP = (function (my) {
-	var my = {};
-	var generators = [];
+    var generators = [];
+    var paused = 0;
+    var pm = postMessage; // The postMessage function is overridden below, keep reference to original.
+    var queue = [];
 
-	my.addMessageGenerator = function (gen) {
-	    if (generators.length == 0) overridePostMessage()
-		generators.push( gen )
-	};
-	
-	my.postHTML = function (html) {
-	    var obj = {"bundle":{"data":{"text/html":html},"metadata":{}},"type":"display_data"};
-	    postMessage(obj);
-	};
+    // Message generators are called after the user code is evaluated to allow results to be finalised.
+    my.addMessageGenerator = function (gen) {
+        generators.push(gen);
+    };
 
-	function callGenerators() {
-	    for (var i=0; i < generators.length; i++) {
-	        generators[i]();
-	    }
-	}
+    my.fetchScriptFE = function(url) {
+        my.pause();
+        var obj = {};
+        queue.push(obj); // Push empty object on queue, add elements later.
 
-	function overridePostMessage() {
-	    // Override the global postMessage function so the registered message generators can post their own messages.
-	    var pm = postMessage;
-        postMessage = function(obj) {
-            if (obj.type === "execute_result") callGenerators();
+        async function load() {
+            const response = await fetch(url);
+            const js = await response.text();
+            var html = `<script type="text/javascript">${js}</script>`;
+            obj.bundle = {"data":{"text/html":html},"metadata":{}};
+            obj.type = "display_data";
+            my.resume();
+        }
+        load();
+    };
+
+    my.loadModule = function (name) {
+        my.js_files_dir = my.js_files_dir || "http://some-default-url.there/";
+        importScripts(my.js_files_dir + "/" + name + ".js");
+        return my[name];
+    };
+
+    my.pause = function () {
+        paused += 1;
+    };
+
+    my.postHTML = function (html) {
+        var obj = {"bundle":{"data":{"text/html":html},"metadata":{}},"type":"display_data"};
+        postMessage(obj);
+    };
+
+    my.postJS = function (js) {
+        var html = `<script type="text/javascript">${js}</script>`;
+        var obj = {"bundle":{"data":{"text/html":html},"metadata":{}},"type":"display_data"};
+        pm(obj);
+    }
+
+    my.resume = function () {
+        paused -= 1;
+        if (paused == 0) {
+            while (queue.length > 0) {
+                var obj = queue.shift();
+                postMessage(obj);
+            }
+        }
+    };
+
+    // Override the global postMessage function so the registered message generators can post their own messages.
+    postMessage = function(obj) {
+        if (paused) {
+            queue.push(obj);
+        }
+        else {
+            if (obj.type === "execute_result") {
+                for (var i=0; i < generators.length; i++) {
+                    generators[i]();
+                }
+            }
             pm(obj);
-        };
-	}
+        }
+    };
 
-	return my;
-}());
+    return my;
+}(WasmDSP));
 

@@ -27,32 +27,24 @@
 
 WasmDSP.Plot = (function () {
 	var my = {};
-	var messages = [];
+	var traces = [];
+	var id = Date.now();
 
 	// Get Plotly and insert in front-end.
-    var html = '<script type="text/javascript" src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>';
-    WasmDSP.postHTML(html);
+    WasmDSP.fetchScriptFE("https://cdn.plot.ly/plotly-2.12.1.min.js");
 
 	WasmDSP.addMessageGenerator(function () {
-	    while (messages.length > 0) {
-            var obj = messages.shift();
-            WasmDSP.postHTML(obj);
-        };
+	    if (traces.length > 0) {
+	        var div_id = "div" + id;
+	        id += 1;
+            var code = `Plotly.newPlot('${div_id}', ${JSON.stringify(traces)})`;
+            WasmDSP.postHTML(`<div id = "${div_id}"></div><script type="text/javascript">${code}</script>`);
+            traces = [];
+        }
 	});
 
 	my.plot = function( y ) {
-        var div_id = "div"+Date.now();
-        var code = `
-        var trace1 = {
-          y: ${JSON.stringify(y)},
-          type: 'scatter'
-        };
-        var data = [trace1];
-
-        Plotly.newPlot('${div_id}', data);`;
-
-        var html = `<div id = "${div_id}"></div><script type="text/javascript">${code}</script>`;
-        messages.push(html);
+        traces.push({y: y, type: 'scatter'});
     };
 
 	return my;

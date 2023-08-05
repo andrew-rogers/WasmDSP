@@ -1,10 +1,9 @@
-
 export default {
 	input: 'signal.js',
 	output: {
-		file: 'signal_iife.js',
+		file: '../../dist/signal.js',
 		format: 'iife',
-		name: 'WasmDSP.signal'
+		name: 'WasmDSP.modules.signal'
 	}
 };
 

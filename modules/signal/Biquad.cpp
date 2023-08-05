@@ -1,5 +1,5 @@
 /*
- * AndrewWIDE - Biquadratic IIR filter.
+ * WasmDSP - Biquadratic IIR filter.
  * Copyright (C) 2023  Andrew Rogers
  *
  * SPDX-License-Identifier: MIT
@@ -33,12 +33,18 @@ extern "C" void* Biquad_new(float b0, float b1, float b2, float a1, float a2)
     return new Biquad(b0,b1,b2,a1,a2);
 }
 
-void Biquad::processBlock( const double* x, double* y, size_t N )
+EMSCRIPTEN_KEEPALIVE
+extern "C" void Biquad_processBlock(Biquad* ptr, const float* x, float* y, size_t N)
+{
+    ptr->processBlock(x, y, N);
+}
+
+void Biquad::processBlock( const float* x, float* y, size_t N )
 {
     for (size_t n=0; n<N; n++)
     {
         // Do the calculation
-        double sum = m_b0*x[n] + m_b1*m_x1 + m_b2*m_x2 - m_a1*m_y1 - m_a2*m_y2;
+        float sum = m_b0*x[n] + m_b1*m_x1 + m_b2*m_x2 - m_a1*m_y1 - m_a2*m_y2;
         y[n] = sum;
         
         // Shift the delays

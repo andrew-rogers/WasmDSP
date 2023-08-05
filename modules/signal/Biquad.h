@@ -1,5 +1,5 @@
 /*
- * AndrewWIDE - Biquadratic IIR filter.
+ * WasmDSP - Biquadratic IIR filter.
  * Copyright (C) 2023  Andrew Rogers
  *
  * SPDX-License-Identifier: MIT
@@ -31,22 +31,22 @@
 class Biquad
 {
 public:
-    Biquad(double b0, double b1, double b2, double a1, double a2) : m_b0(b0), m_b1(b1), m_b2(b2), m_a1(a1), m_a2(a2)
+    Biquad(float b0, float b1, float b2, float a1, float a2) : m_b0(b0), m_b1(b1), m_b2(b2), m_a1(a1), m_a2(a2)
     {
     }
     
-    void processBlock( const double* x, double* y, size_t N );
+    void processBlock( const float* x, float* y, size_t N );
 
 private:
-    double m_b0;
-    double m_b1;
-    double m_b2;
-    double m_a1;
-    double m_a2;
-    double m_x1;
-    double m_x2;
-    double m_y1;
-    double m_y2;
+    float m_b0;
+    float m_b1;
+    float m_b2;
+    float m_a1;
+    float m_a2;
+    float m_x1;
+    float m_x2;
+    float m_y1;
+    float m_y2;
 };
 
 #endif // BIQUAD_H

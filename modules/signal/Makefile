@@ -7,5 +7,5 @@ $(TARGET)_wasm.js: $(TARGET).wasm
 	base64 $< >> $@
 	echo "\`;" >> $@
 
-$(TARGET).wasm: Biquad.o
+$(TARGET).wasm: Biquad.o Buffer.o
 	$(CXX) $^ $(LDFLAGS) -o $@ -Oz

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+        <script src="../dist/WasmDSP.js"></script>
+    </head>
+    <body>
+        <script>
+        function start() {
+            WasmDSP.importModules(["../dist/modules/signal.js"])
+                .then(function() {
+                    impulseResponse()
+                })
+                .catch(function(e) {
+                    console.log(e);
+                });
+        }
+        
+        function impulseResponse() {
+        }
+        
+        start();
+        </script>
+    </body>
+</html>

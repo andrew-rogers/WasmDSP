@@ -1,6 +1,11 @@
 
 LDFLAGS += --no-entry
-TARGET = signal.wasm
+TARGET = signal
 
-$(TARGET): Biquad.o
+$(TARGET)_wasm.js: $(TARGET).wasm
+	echo "export const b64=\`" > $@
+	base64 $< >> $@
+	echo "\`;" >> $@
+
+$(TARGET).wasm: Biquad.o
 	$(CXX) $^ $(LDFLAGS) -o $@ -Oz

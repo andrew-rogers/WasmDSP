@@ -1,4 +1,5 @@
 export function compileWasm(b64) {
+    wasm_cnt++;
     return new Promise(function(resolve, reject) {
         let module = {};
         createImports(module);
@@ -10,6 +11,8 @@ export function compileWasm(b64) {
             // Initialise the wasm.
             module.exports._initialize();
             resolve(module);
+            wasm_done++;
+            wasmCheck();
         })
         .catch((e) => {
             reject(e);
@@ -20,6 +23,9 @@ export function compileWasm(b64) {
 export function importModules(urls) {
     return new Promise(function(resolve, reject){
         let cnt = 0;
+        callback = function() {
+            resolve();
+        };
         for (var i=0; i<urls.length; i++) {
             var script = document.createElement('script');
             script.setAttribute('src', urls[i]);
@@ -27,13 +33,17 @@ export function importModules(urls) {
             script.onload = function() {
                 cnt++;
                 if (cnt == urls.length) {
-                    resolve();
+                    wasmCheck();
                 }
             };
             document.head.appendChild(script);
         }
     });
 }
+
+let callback = null;
+let wasm_cnt = 0;
+let wasm_done = 0;
 
 function createImports(module) {
     var env = {};
@@ -56,4 +66,10 @@ function createImports(module) {
     };
 
     module.imports = {env: env, wasi_snapshot_preview1: wsp};
+}
+
+function wasmCheck() {
+    if (wasm_done >= wasm_cnt) {
+        if (callback) callback();
+    }
 }

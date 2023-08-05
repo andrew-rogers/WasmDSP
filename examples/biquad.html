@@ -17,6 +17,7 @@
         }
         
         function impulseResponse() {
+            let bq = new WasmDSP.modules.signal.Biquad(1,0,1,1.9,0.9);
         }
         
         start();

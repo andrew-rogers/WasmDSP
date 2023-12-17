@@ -27,22 +27,20 @@
 
 import * as fs from 'fs'
 
-function fileToBase64(filename) {
-    const content = fs.readFileSync(filename);
-    const b64 = content.toString('base64');
-
-    let ret = '';
-    for (let i = 0; i < b64.length; i+=76) {
-        ret += b64.substr(i,76) + '\n';
-    }
-
-    return ret;
+function embed(fn_in, fn_out) {
+    const input = fs.readFileSync(fn_in, 'utf8');
+    const lines = input.split('\n');
+    let output = '';
+    lines.forEach(function(line) {
+    	if (line.startsWith('#include ')) {
+    	    const fn = JSON.parse(line.substr(9));
+    	    output += fs.readFileSync(fn, 'utf8') + '\n';
+    	} else {
+    	    output += line + '\n';
+    	}
+    });
+    fs.writeFileSync(fn_out, output);
 }
 
-const hdr = 'const b64 = `\n';
-const tail = '`;\nexport {b64};\n';
-const fn = process.argv[2];
-const out = fileToBase64(fn);
-
-fs.writeFileSync(process.argv[3], hdr+out+tail);
+embed (process.argv[2], process.argv[3]);
 

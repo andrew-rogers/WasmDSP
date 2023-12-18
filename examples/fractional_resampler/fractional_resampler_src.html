@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+    </head>
+    <body>
+        <script>
+
+#include "fractional_resampler.js"
+
+var wasm_b64 = modules.b64;
+
+var wasm_compile = function(b64, callback){
+    var wasm_buffer = Uint8Array.from(atob(b64), c => c.charCodeAt(0)).buffer;
+    WebAssembly.compile(wasm_buffer).then(wasm => {
+        var wasm_instance = new WebAssembly.Instance(wasm);
+        callback(wasm_instance);
+    });
+};
+
+wasm_compile(wasm_b64,function(module){
+    alert('' + module.exports.resample());
+});
+
+        </script>
+    </body>
+</html>

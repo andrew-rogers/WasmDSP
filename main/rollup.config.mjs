@@ -1,8 +1,8 @@
 export default {
-	input: 'WasmDSP.js',
+	input: 'WasmDSP.mjs',
 	output: {
 		file: '../dist/WasmDSP.js',
-		format: 'iife',
+		format: 'umd',
 		name: 'WasmDSP'
 	}
 };

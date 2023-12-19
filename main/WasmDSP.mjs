@@ -1,3 +1,7 @@
+import {WasmModule} from './WasmModule.mjs'
+
+export {WasmModule}
+
 export function compileWasm(b64) {
     wasm_cnt++;
     return new Promise(function(resolve, reject) {

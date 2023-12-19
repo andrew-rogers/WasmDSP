@@ -124,34 +124,10 @@ WasmModule.prototype.writeString = function( string, address ) {
 WasmModule.prototype._createImports = function() {
     var env = {};
     var that = this;
-    env.emjs_add_js_func = function(name, src) {
-        AndrewWIDE.js_funcs = AndrewWIDE.js_funcs || {};
-        AndrewWIDE.js_funcs[that.readString(name)] = new Function('ptr', that.readString(src));
-    };
 
-    env.emjs_add_response_cmd = function(src) {
-        wasm.addResponseCommand(that.readString(src));
-    };
-
-    env.emjs_add_wasm_vectors = function(name, ptr) {
-        new WasmVectors(that.readString(name), ptr);
-    };
-
-    env.emjs_call_js_func = function(name, ptr) {
-        return AndrewWIDE.js_funcs[that.readString(name)](ptr);
-    };
-
-    env.emjs_call_wasmjs = function(module, func, ptr) {
-        return AndrewWIDE.wasmjs[that.readString(module)][that.readString(func)](ptr);
-    };
-
-    env.emjs_wasm_vectors_add = function(p_wvs, name, ptr, type) {
-        var wvs = WasmVectors.dict["p"+p_wvs]; // Lookup the WasmVectors to add the WasmVector to.
-        wvs.addPtr(that.readString(name), ptr, type);
-    };
-
-    env.emjs_console_log = function(p_str) {
-        console.log(that.readString(p_str));
+    env.emjs_event = function( id ) {
+        // TODO id can be used to reference an serviceable object.
+        console.log(`Event ${id} not handled.`);
     };
 
     var wsp = {};

@@ -34,7 +34,7 @@ namespace WasmDSP
 class JsMediator : public IMediator
 {
 public:
-	virtual void notify(const uint32_t id);
+	virtual void notify(void* sender, const uint32_t id);
 };
 
 } // namespace WasmDSP

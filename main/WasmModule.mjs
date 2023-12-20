@@ -109,7 +109,7 @@ WasmModule.prototype.setMemory = function(buffer) {
 WasmModule.prototype.write = function( type, arr, address ) {
     var mem = this.module.mem[type];
     var index = address >> mem.address_shift;
-    mem.set( arr, index );
+    mem.buf.set( arr, index );
 };
 
 WasmModule.prototype.writeString = function( string, address ) {
@@ -125,7 +125,7 @@ WasmModule.prototype._createImports = function() {
     var env = {};
     var that = this;
 
-    env.emjs_event = function( id ) {
+    env.emjs_event = function( sender, mediator, id ) {
         // TODO id can be used to reference an serviceable object.
         console.log(`Event ${id} not handled.`);
     };

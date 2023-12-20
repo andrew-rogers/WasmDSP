@@ -31,7 +31,7 @@
 namespace WasmDSP
 {
 
-void emjs_event(uint32_t id);
+void emjs_event(void* sender, void* mediator, uint32_t id);
 
 } // namespace WasmDSP
 

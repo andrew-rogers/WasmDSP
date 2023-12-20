@@ -33,7 +33,7 @@
  class IMediator
  {
  public:
- 	virtual void notify(const uint32_t id) = 0; 
+ 	virtual void notify(void* sender, const uint32_t id) = 0;
  };
  
  } // namespace WasmDSP

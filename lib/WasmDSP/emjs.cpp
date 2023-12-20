@@ -28,16 +28,16 @@
 #include <emscripten.h>
 
 // Send JavaScript an event code.
-EM_JS( void, emjs_event, (uint32_t id), {
+EM_JS( void, emjs_event, (void* sender, void* mediator, uint32_t id), {
     // Body defined in runtime.
 });
 
 namespace WasmDSP
 {
 
-void emjs_event(uint32_t id)
+void emjs_event(void* sender, void* mediator, uint32_t id)
 {
-	::emjs_event(id);
+	::emjs_event(sender, mediator, id);
 }
 
 } // namespace WasmDSP

@@ -29,9 +29,9 @@
 namespace WasmDSP
 {
 
-void JsMediator::notify(const uint32_t id)
+void JsMediator::notify(void* sender, const uint32_t id)
 {
-	emjs_event(id);
+	emjs_event(sender, this, id);
 }
 
 } // namespace WasmDSP

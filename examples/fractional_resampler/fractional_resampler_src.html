@@ -15,14 +15,19 @@ mod.initialise(modules.b64, function() {
     let p_input = mod.exports.allocFloat32(FrameLen);
     let p_output = mod.exports.allocFloat32(FrameLen);
     let fr = {ptr: mod.exports.FractionalResampler_new(0.33, p_input, FrameLen, p_output, FrameLen)};
+    fr.output = [];
     fr.resample = function(input) {
         let num_frames = Math.floor(input.length/FrameLen);
         for (let n=0; n < num_frames; n++) {
             mod.write('F32', input.slice(n * FrameLen, (n+1) * FrameLen), p_input);
             mod.exports.FractionalResampler_resample(fr.ptr);
         }
+        return fr.output;
     };
-    mod.exports.test_notify(9);
+    mod.addHandler(fr.ptr, function(id){
+    	const vals = mod.read('F32', p_output, FrameLen);
+    	fr.output.push(...vals);
+    });
 
     let r=[];
     for (let n=0; n<1000; n++) r.push(n);

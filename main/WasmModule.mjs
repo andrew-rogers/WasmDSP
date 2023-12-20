@@ -26,11 +26,15 @@
  */
 
 var WasmModule = function() {
-    this.stack=0;
-    this.meta = {};
     this.module = {};
-    this.response_cmds = []; // Response commands.
     this._createImports();
+    this.p_mediator = 0;
+    this.handlers = {};
+};
+
+WasmModule.prototype.addHandler = function(ptr, func) {
+    const key = 's' + ptr;
+    this.handlers[key] = func;
 };
 
 WasmModule.prototype.callCFunc = function( func_name ) {
@@ -125,9 +129,8 @@ WasmModule.prototype._createImports = function() {
     var env = {};
     var that = this;
 
-    env.emjs_event = function( sender, mediator, id ) {
-        // TODO id can be used to reference an serviceable object.
-        console.log(`Event ${id} not handled.`);
+    env.emjs_event = function( mediator, sender, id ) {
+        that._handleEvent(mediator, sender, id);
     };
 
     var wsp = {};
@@ -149,6 +152,17 @@ WasmModule.prototype._createImports = function() {
     };
 
     this.module.imports = {env: env, wasi_snapshot_preview1: wsp};
+};
+
+WasmModule.prototype._handleEvent = function(mediator, sender, id) {
+	if (this.p_mediator == 0) this.p_mediator = this.exports.get_mediator();
+	if (mediator == this.p_mediator) {
+		let key = 's' + sender;
+		this.handlers[key](id);
+	}
+	else {
+		console.log(`Mediator ${mediator} is not ours.`);
+	}
 };
 
 export {WasmModule}

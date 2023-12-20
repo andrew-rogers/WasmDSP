@@ -26,10 +26,14 @@
 #ifndef EMJS_H
 #define EMJS_H
 
+#include "JsMediator.h"
+
 #include <cstdint>
 
 namespace WasmDSP
 {
+
+extern JsMediator g_mediator;
 
 void emjs_event(void* sender, void* mediator, uint32_t id);
 

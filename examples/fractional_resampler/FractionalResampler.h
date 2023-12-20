@@ -20,19 +20,31 @@
 #ifndef FRACTIONAL_RESAMPLER_H
 #define FRACTIONAL_RESAMPLER_H
 
-#include <cstdint>
+#include "IMediator.h"
+
+#include <cstdlib>
 
 class FractionalResampler
 {
 public:
-	FractionalResampler(uint32_t M, uint32_t N);
-	uint32_t resample(double* input, uint32_t num_samples, double* output);
+	FractionalResampler(const float rate, WasmDSP::IMediator* mediator, const float* input, const size_t input_len, float* output, const size_t output_max);
+	void resample();
 
 private:
-	uint32_t M,N;
-	int32_t cnt;
-	double prev;
-	double invM;
+	float m_step;
+	WasmDSP::IMediator* m_mediator;
+	const float* m_input;
+	size_t m_input_len;
+	float* m_output;
+	size_t m_output_max;
+	float m_index;
+	float m_prev;
+	size_t m_cnt;
+
+	void notify(uint32_t id)
+	{
+		m_mediator->notify(this, id);
+	}
 };
 
 #endif // FRACTIONAL_RESAMPLER_H

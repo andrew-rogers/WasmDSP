@@ -19,34 +19,33 @@
 
 #include "FractionalResampler.h"
 
-FractionalResampler::FractionalResampler(uint32_t M, uint32_t N)
+FractionalResampler::FractionalResampler(const float rate, WasmDSP::IMediator* mediator, const float* input, const size_t input_len, float* output, const size_t output_max) : m_step(1.0F / rate), m_mediator(mediator), m_input(input), m_input_len(input_len), m_output(output), m_output_max(output_max), m_index(0.0F), m_prev(0.0F), m_cnt(0U)
 {
-	this->M = M;
-	this->N = N;
-	invM = 1.0L / M;
-	cnt = 0;
-	prev = 0.0L;
 }
 
-uint32_t FractionalResampler::resample(double* input, uint32_t num_samples, double* output)
+void FractionalResampler::resample()
 {
-	int m = 0;
-	for( int n=0; n<num_samples; n++)
+	for (size_t n = 0U; n<m_input_len; n++)
 	{
-		double curr = input[n];
+		float curr = m_input[n];
 
-		while(cnt<M)
+		while (m_index < 1.0F)
 		{
 			// Linear interpolation between two adjacent entries in input
-			output[m]=prev + (curr-prev)*cnt*invM;
-			m++;
+			m_output[m_cnt] = m_prev + (curr-m_prev) * m_index;
+			m_cnt++;
 
-			cnt = cnt + N;
+			if (m_cnt >= m_output_max)
+			{
+				m_cnt = 0U;
+				notify(0U);
+			}
+
+			m_index += m_step;
 		}
-		cnt=cnt-M;
+		m_index -= 1.0F;
 
-		prev = curr;
+		m_prev = curr;
 	}
-	return m;
 }
 

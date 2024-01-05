@@ -1,5 +1,5 @@
 export default {
-	input: 'signal.js',
+	input: 'signal.mjs',
 	output: {
 		file: '../../dist/modules/signal.js',
 		format: 'iife',

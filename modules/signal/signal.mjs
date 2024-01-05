@@ -1,4 +1,4 @@
-import {b64} from './signal_wasm.js'
+import {b64} from './signal_wasm'
 import {Biquad} from './Biquad'
 import {FIR} from './FIR'
 

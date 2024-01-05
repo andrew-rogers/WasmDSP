@@ -27,25 +27,17 @@
 
 #include <emscripten.h>
 
-EMSCRIPTEN_KEEPALIVE
-extern "C" void* get_mediator(const size_t size)
-{
-	return &WasmDSP::g_mediator;
-}
-
 // Send JavaScript an event code.
-EM_JS( void, emjs_event, (void* mediator, void* sender, uint32_t id), {
+EM_JS( void, emjs_event, (void* sender, uint32_t id), {
     // Body defined in runtime.
 });
 
 namespace WasmDSP
 {
 
-JsMediator g_mediator;
-
-void emjs_event(void* mediator, void* sender, uint32_t id)
+void emjs_event(void* sender, uint32_t id)
 {
-	::emjs_event(mediator, sender, id);
+	::emjs_event(sender, id);
 }
 
 } // namespace WasmDSP

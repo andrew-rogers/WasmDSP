@@ -1,6 +1,6 @@
 /*
     Fractional Resampler - Performs a fractional change of sample rate
-    Copyright (C) 2020  Andrew Rogers
+    Copyright (C) 2024  Andrew Rogers
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,35 +17,35 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef FRACTIONAL_RESAMPLER_H
-#define FRACTIONAL_RESAMPLER_H
+#include "FractionalResampler.h"
 
-#include "IMediator.h"
-
-#include <cstdlib>
-
-class FractionalResampler
+FractionalResampler::FractionalResampler(const float rate, IMediator* mediator, const float* input, const size_t input_len, float* output, const size_t output_max) : m_step(1.0F / rate), m_mediator(mediator), m_input(input), m_input_len(input_len), m_output(output), m_output_max(output_max), m_index(0.0F), m_prev(0.0F), m_cnt(0U)
 {
-public:
-	FractionalResampler(const float rate, WasmDSP::IMediator* mediator, const float* input, const size_t input_len, float* output, const size_t output_max);
-	void resample();
+}
 
-private:
-	float m_step;
-	WasmDSP::IMediator* m_mediator;
-	const float* m_input;
-	size_t m_input_len;
-	float* m_output;
-	size_t m_output_max;
-	float m_index;
-	float m_prev;
-	size_t m_cnt;
-
-	void notify(uint32_t id)
+void FractionalResampler::resample()
+{
+	for (size_t n = 0U; n<m_input_len; n++)
 	{
-		m_mediator->notify(this, id);
-	}
-};
+		float curr = m_input[n];
 
-#endif // FRACTIONAL_RESAMPLER_H
+		while (m_index < 1.0F)
+		{
+			// Linear interpolation between two adjacent entries in input
+			m_output[m_cnt] = m_prev + (curr-m_prev) * m_index;
+			m_cnt++;
+
+			if (m_cnt >= m_output_max)
+			{
+				m_cnt = 0U;
+				notify(0U);
+			}
+
+			m_index += m_step;
+		}
+		m_index -= 1.0F;
+
+		m_prev = curr;
+	}
+}
 

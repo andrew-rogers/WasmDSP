@@ -28,7 +28,6 @@
 var WasmModule = function() {
     this.module = {};
     this._createImports();
-    this.p_mediator = 0;
     this.handlers = {};
 };
 
@@ -154,15 +153,9 @@ WasmModule.prototype._createImports = function() {
     this.module.imports = {env: env, wasi_snapshot_preview1: wsp};
 };
 
-WasmModule.prototype._handleEvent = function(mediator, sender, id) {
-	if (this.p_mediator == 0) this.p_mediator = this.exports.get_mediator();
-	if (mediator == this.p_mediator) {
-		let key = 's' + sender;
-		this.handlers[key](id);
-	}
-	else {
-		console.log(`Mediator ${mediator} is not ours.`);
-	}
+WasmModule.prototype._handleEvent = function(sender, id) {
+	let key = 's' + sender;
+	this.handlers[key](id);
 };
 
 export {WasmModule}

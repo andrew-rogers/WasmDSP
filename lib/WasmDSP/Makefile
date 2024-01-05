@@ -1,4 +1,4 @@
-OBJS = emjs.o JsMediator.o
+OBJS = emjs.o
 
 CXXFLAGS += -fPIC
  

@@ -1,11 +1,22 @@
 #include "FractionalResampler.h"
-#include "JsMediator.h"
 #include "emjs.h"
 
 #include <cstdint>
 #include <emscripten.h>
 
-WasmDSP::IMediator* mediator = &WasmDSP::g_mediator;
+class Mediator : public IMediator
+{
+public:
+	virtual void notify(void* sender, const uint32_t id);
+};
+
+void Mediator::notify(void* sender, const uint32_t id)
+{
+	WasmDSP::emjs_event(sender, id);
+}
+
+Mediator m;
+IMediator* mediator = &m;
 
 EMSCRIPTEN_KEEPALIVE
 extern "C" void* allocFloat32(const size_t size)

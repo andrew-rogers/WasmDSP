@@ -4,10 +4,10 @@ JS = fractional_resampler.js
 HTML_SRC = fractional_resampler_src.html
 HTML = fractional_resampler.html
 
-OBJS = fractional_resampler.o FractionalResampler.o
+OBJS = fractional_resampler.o
 
-CXXFLAGS += -I ../../lib/WasmDSP
-LDFLAGS = -L ../../lib/WasmDSP -l WasmDSP --no-entry
+CXXFLAGS += -I ../../lib/WasmDSP -I ./fwalgs
+LDFLAGS = -L ../../lib/WasmDSP -L ./fwalgs -l WasmDSP -l FR --no-entry
 
 RM = rm -f
 WASM2MJS = $(EMSDK_NODE) ../../tools/wasm2mjs.mjs

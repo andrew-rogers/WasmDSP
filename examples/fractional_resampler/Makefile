@@ -9,7 +9,7 @@ OBJS = fractional_resampler.o
 CXXFLAGS += -I ../../lib/WasmDSP -I ./fwalgs
 LDFLAGS = -L ../../lib/WasmDSP -L ./fwalgs -l WasmDSP -l FR --no-entry
 
-RM = rm -f
+RM = $(EMSDK_NODE) ../../tools/rm.mjs # Windows del doesn't like forward slashes, use simple rm node script.
 WASM2MJS = $(EMSDK_NODE) ../../tools/wasm2mjs.mjs
 EMBED = $(EMSDK_NODE) ../../tools/embed.mjs
 

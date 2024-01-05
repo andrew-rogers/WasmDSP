@@ -1,18 +1,29 @@
 TARGET = signal
-MJS = $(TARGET).mjs $(TARGET)_wasm.mjs Biquad.mjs FIR.mjs
-DISTMOD = ../../dist/modules
+WASM = $(TARGET).wasm
+WASMMJS = $(TARGET)_wasm.mjs
+MJS = $(TARGET).mjs Biquad.mjs FIR.mjs
+WASMDSP = ../..
+DISTMOD = $(WASMDSP)/dist/modules
 JS = $(DISTMOD)/$(TARGET).js
+
+OBJS = Biquad.o Buffer.o
 
 LDFLAGS += --no-entry
 
-$(JS): $(MJS)
+
+RM = $(EMSDK_NODE) $(WASMDSP)/tools/rm.mjs # Windows del doesn't like forward slashes, use simple rm node script.
+WASM2MJS = $(EMSDK_NODE) $(WASMDSP)/tools/wasm2mjs.mjs
+
+$(JS): $(MJS) $(WASMMJS)
 	rollup -c
 
-$(TARGET)_wasm.mjs: $(TARGET).wasm
-	echo "export const b64=\`" > $@
-	base64 $< >> $@
-	echo "\`;" >> $@
+$(WASMMJS): $(WASM)
+	$(WASM2MJS) $< $@
 
-$(TARGET).wasm: Biquad.o Buffer.o
+$(WASM): $(OBJS)
 	$(CXX) $^ $(LDFLAGS) -o $@ -Oz
+
+clean:
+	$(RM) $(WASM) $(WASMMJS) $(JS)
+	$(RM) $(OBJS)
 

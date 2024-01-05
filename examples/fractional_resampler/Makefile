@@ -1,27 +1,29 @@
-TARGET = fractional_resampler.wasm
-MODULE = fractional_resampler.mjs
-JS = fractional_resampler.js
-HTML_SRC = fractional_resampler_src.html
-HTML = fractional_resampler.html
+TARGET = fractional_resampler
+WASM = $(TARGET).wasm
+WASMMJS = $(TARGET)_wasm.mjs
+WASMDSP = ../..
+JS = $(TARGET).js
+HTML_SRC = $(TARGET)_src.html
+HTML = $(TARGET).html
 
-OBJS = fractional_resampler.o
+OBJS = $(TARGET).o
 
 CXXFLAGS += -I ../../lib/WasmDSP -I ./fwalgs
 LDFLAGS = -L ../../lib/WasmDSP -L ./fwalgs -l WasmDSP -l FR --no-entry
 
-RM = $(EMSDK_NODE) ../../tools/rm.mjs # Windows del doesn't like forward slashes, use simple rm node script.
-WASM2MJS = $(EMSDK_NODE) ../../tools/wasm2mjs.mjs
-EMBED = $(EMSDK_NODE) ../../tools/embed.mjs
+RM = $(EMSDK_NODE) $(WASMDSP)/tools/rm.mjs # Windows del doesn't like forward slashes, use simple rm node script.
+WASM2MJS = $(EMSDK_NODE) $(WASMDSP)/tools/wasm2mjs.mjs
+EMBED = $(EMSDK_NODE) $(WASMDSP)/tools/embed.mjs
 
 all: $(HTML)
 
-$(TARGET): $(OBJS)
+$(WASM): $(OBJS)
 	$(CXX) $(OBJS) $(LDFLAGS) -o $@ -Oz
 
-$(MODULE): $(TARGET)
+$(WASMMJS): $(WASM)
 	$(WASM2MJS) $< $@
 
-$(JS): $(MODULE)
+$(JS): $(WASMMJS)
 	rollup -c
 
 $(HTML): $(HTML_SRC) $(JS)
@@ -31,6 +33,6 @@ $(HTML): $(HTML_SRC) $(JS)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	$(RM) $(TARGET) $(MODULE) $(JS) $(HTML)
+	$(RM) $(WASM) $(WASMMJS) $(JS) $(HTML)
 	$(RM) $(OBJS)
 

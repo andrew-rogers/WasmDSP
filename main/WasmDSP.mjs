@@ -2,6 +2,22 @@ import {WasmModule} from './WasmModule.mjs'
 
 export {WasmModule}
 
+export function initialise(modules, callback) {
+	let wasm_cnt = 0;
+	let wasm_done = 0;
+	for (let k in modules) {
+		let module = modules[k];
+		if (module.b64) {
+			wasm_cnt++;
+			module.wasm = new WasmModule();
+			module.wasm.initialise(module.b64, function(){
+				wasm_done++;
+		        if (wasm_done >= wasm_cnt) callback();
+			});
+		}
+	}
+}
+
 export function compileWasm(b64) {
     wasm_cnt++;
     return new Promise(function(resolve, reject) {

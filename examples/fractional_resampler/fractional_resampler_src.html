@@ -7,11 +7,12 @@
         <script>
 
 #include "../../dist/WasmDSP.js"
+#include "../../dist/modules/signal.js"
 #include "fractional_resampler.js"
 
-let mod = new WasmDSP.WasmModule();
-mod.initialise(modules.b64, function() {
+WasmDSP.initialise(WasmDSP.modules, function() {
     const FrameLen = 128;
+    let mod = WasmDSP.modules.fractional_resampler.wasm;
     let p_input = mod.exports.allocFloat32(FrameLen);
     let p_output = mod.exports.allocFloat32(FrameLen);
     let fr = {ptr: mod.exports.FractionalResampler_new(0.33, p_input, FrameLen, p_output, FrameLen)};
@@ -32,6 +33,9 @@ mod.initialise(modules.b64, function() {
     let r=[];
     for (let n=0; n<1000; n++) r.push(n);
     let out = fr.resample(r);
+
+    let bq=new WasmDSP.modules.signal.Biquad(1,0,1,1.5,0.8);
+    console.log(bq.process([1,0,0,0,0,0,0,0]));
 });
 
         </script>

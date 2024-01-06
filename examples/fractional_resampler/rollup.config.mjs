@@ -3,7 +3,7 @@ export default {
 	output: {
 		file: 'fractional_resampler.js',
 		format: 'umd',
-		name: 'modules'
+		name: 'WasmDSP.modules.fractional_resampler'
 	}
 };
 

@@ -7,5 +7,5 @@ WasmDSP.compileWasm(b64).then(function(w){
     FIR._wasm = w;
 });
 
-export {Biquad, FIR};
+export {b64, Biquad, FIR};
 

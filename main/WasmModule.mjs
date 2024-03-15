@@ -36,6 +36,13 @@ WasmModule.prototype.addHandler = function(ptr, func) {
     this.handlers[key] = func;
 };
 
+WasmModule.prototype.addImports = function(imports) {
+    let env = this.module.imports.env;
+    for (let i in imports) {
+        env[i] = imports[i];
+    }
+};
+
 WasmModule.prototype.callCFunc = function( func_name ) {
     console.log("Wasm not initialised."); // Re-defined in initialise().
 };

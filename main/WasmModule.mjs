@@ -153,6 +153,11 @@ WasmModule.prototype._createImports = function() {
         that.array_list[id].push(...vals);
     };
 
+    env.jsEval = function( utf8_src ) {
+        const f = Function(that.readString(utf8_src));
+        f();
+    };
+
     var wsp = {};
 
     wsp.fd_close = function() {

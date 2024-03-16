@@ -32,12 +32,21 @@ EM_JS( void, emjs_event, (void* sender, uint32_t id), {
     // Body defined in runtime.
 });
 
+EM_JS( void, jsEval, (const char *str), {
+    // Body defined in runtime.
+});
+
 namespace WasmDSP
 {
 
 void emjs_event(void* sender, uint32_t id)
 {
 	::emjs_event(sender, id);
+}
+
+void jsEval(const char* str)
+{
+    ::jsEval(str);
 }
 
 } // namespace WasmDSP

@@ -32,6 +32,7 @@ namespace WasmDSP
 {
 
 void emjs_event(void* sender, uint32_t id);
+void jsEval(const char* str);
 
 } // namespace WasmDSP
 

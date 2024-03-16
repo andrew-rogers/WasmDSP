@@ -26,6 +26,8 @@
  */
 
 var WasmModule = function() {
+    this.arrays = {};
+    this.array_list = [];
     this.module = {};
     this._createImports();
     this.handlers = {};
@@ -137,6 +139,18 @@ WasmModule.prototype._createImports = function() {
 
     env.emjs_event = function( mediator, sender, id ) {
         that._handleEvent(mediator, sender, id);
+    };
+
+    env.jsArrayOpen = function( utf8_name ) {
+        const name = that.readString(utf8_name);
+        that.arrays[name] = that.arrays[name] || [];
+        that.array_list.push(that.arrays[name]);
+        return that.array_list.length - 1;
+    };
+
+    env.jsArrayWrite = function( id, ptr, cnt) {
+        const vals = that.read('F32', ptr, cnt);
+        that.array_list[id].push(...vals);
     };
 
     var wsp = {};

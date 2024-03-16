@@ -1,4 +1,4 @@
-OBJS = emjs.o
+OBJS = emjs.o JSArray.o
 
 CXXFLAGS += -fPIC
  

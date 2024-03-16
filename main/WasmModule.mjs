@@ -154,8 +154,8 @@ WasmModule.prototype._createImports = function() {
     };
 
     env.jsEval = function( utf8_src ) {
-        const f = Function(that.readString(utf8_src));
-        f();
+        const f = Function("wasm_module", that.readString(utf8_src));
+        f(that);
     };
 
     var wsp = {};

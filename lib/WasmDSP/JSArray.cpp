@@ -31,6 +31,10 @@ EM_JS( int32_t, jsArrayOpen, (const char* name), {
     // Body defined in runtime.
 });
 
+EM_JS( int32_t, jsArrayRead, (int32_t id, float* ptr, uint32_t index, uint32_t cnt), {
+    // Body defined in runtime.
+});
+
 EM_JS( void, jsArrayWrite, (int32_t id, const float* ptr, uint32_t cnt), {
     // Body defined in runtime.
 });
@@ -41,6 +45,13 @@ namespace WasmDSP
 int32_t jsArrayOpen(const char* name)
 {
     return ::jsArrayOpen(name);
+}
+
+int32_t JSArray::read(float* ptr, uint32_t cnt)
+{
+    int32_t nread = jsArrayRead(m_id, ptr, m_pos, cnt);
+    if (nread > 0) m_pos += nread;
+    return nread;
 }
 
 void jsArrayWrite(int32_t id, const float* ptr, uint32_t cnt)

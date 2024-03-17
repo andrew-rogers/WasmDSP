@@ -39,7 +39,10 @@ public:
     JSArray(const char* name)
     {
         m_id = jsArrayOpen(name);
+        m_pos = 0U;
     }
+
+    int32_t read(float* ptr, uint32_t cnt);
 
     void write(const float* ptr, uint32_t cnt)
     {
@@ -47,6 +50,7 @@ public:
     }
 private:
     int32_t m_id;
+    uint32_t m_pos;
 };
 
 } // namespace WasmDSP

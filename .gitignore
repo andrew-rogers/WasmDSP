@@ -1,4 +1,4 @@
 *.o
 *.wasm
 *_wasm.js
-
+modules/signal/signal_wasm.mjs

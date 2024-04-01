@@ -17,4 +17,17 @@ export class FFT {
     FFT._wasm.exports.FFT_processBlock(this.ptr, this.ptrX, this.ptrY);
     return Array.from(this.bufY);
   }
+
+  specgram(x) {
+    let y = []
+    for (let i=0; i<x.length; i+=this.bufY.length) {
+      let sub = x.slice(i,i+this.bufY.length);
+      let frame = [];
+      this.bufX.set(sub);
+      FFT._wasm.exports.FFT_processBlock(this.ptr, this.ptrX, this.ptrY);
+      for (let j = 0; j < this.bufY.length; j+=2) frame.push(Math.sqrt(this.bufY[j] * this.bufY[j] + this.bufY[j+1] * this.bufY[j+1]));
+      y.push(frame);
+    }
+    return y;
+  }
 }

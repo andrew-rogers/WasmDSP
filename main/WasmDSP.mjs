@@ -37,8 +37,7 @@ export function initialise(modules, callback) {
 		if (module.b64) {
 			wasm_cnt++;
 			module.wasm = new WasmModule();
-                        module.wasm.addImports(module.imports);
-			module.wasm.initialise(module.b64, function(){
+			module.wasm.initialise(module, function(){
 				wasm_done++;
 				if (module.onWasm) module.onWasm(module.wasm);
 		        if (wasm_done >= wasm_cnt) callback();

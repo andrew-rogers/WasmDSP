@@ -53,8 +53,18 @@ WasmModule.prototype.cfunc = function( func_name ) {
     console.log("Wasm not initialised."); // Re-defined in initialise().
 };
 
-WasmModule.prototype.initialise = function (binary, postInit) {
+WasmModule.prototype.initialise = function (module, postInit) {
 
+    module.arrays = module.arrays || {};
+    this.arrays = module.arrays;
+
+    let imports = module.imports;
+    let env = this.module.imports.env;
+    for (let i in imports) {
+      env[i] = imports[i];
+    }
+
+    let binary = module.b64;
     if (typeof binary === 'string') {
         // Convert base64 into binary
         binary = Uint8Array.from(atob(binary), c => c.charCodeAt(0)).buffer;

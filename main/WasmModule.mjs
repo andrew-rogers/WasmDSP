@@ -158,13 +158,13 @@ WasmModule.prototype._createImports = function() {
         return that.array_list.length - 1;
     };
 
-    env.jsArrayRead = function( id, ptr, index, cnt ) {
+    env.jsArrayRead = function( id, type, ptr, index, cnt ) {
         const arr = that.array_list[id].slice(index, index+cnt);
         that.write( 'F32', arr, ptr );
         return arr.length;
     };
 
-    env.jsArrayWrite = function( id, ptr, cnt) {
+    env.jsArrayWrite = function( id, type, ptr, cnt) {
         const vals = that.read('F32', ptr, cnt);
         that.array_list[id].push(...vals);
     };

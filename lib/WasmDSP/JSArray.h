@@ -31,11 +31,13 @@
 namespace WasmDSP {
 
 int32_t jsArrayOpen(const char* name);
-void jsArrayWrite(int32_t id, const float* ptr, uint32_t cnt);
+void jsArrayWrite(int32_t id, int32_t type, const void* ptr, uint32_t cnt);
 
 class JSArray
 {
 public:
+    enum Type{ STRING, INT8, UINT8, INT16, UINT16, INT32, UINT32, INT64, UINT64, FLOAT32, FLOAT64 };
+
     JSArray(const char* name)
     {
         m_id = jsArrayOpen(name);
@@ -46,7 +48,7 @@ public:
 
     void write(const float* ptr, uint32_t cnt)
     {
-        jsArrayWrite(m_id, ptr, cnt);
+        jsArrayWrite(m_id, Type::FLOAT32, ptr, cnt);
     }
 private:
     int32_t m_id;

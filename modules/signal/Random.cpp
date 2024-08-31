@@ -23,8 +23,7 @@
  * THE SOFTWARE.
  */
  
-#include "random.h"
-#include "vecmath.h"
+#include "Random.h"
 
 #include <cmath>
 
@@ -51,9 +50,8 @@ Random32::Random32(uint32_t seed) : m_seed(seed)
     if( seed == 0U ) m_seed = 2463534242U;
 }
 
-WasmVector<double> Random32::normal(size_t N)
+void Random32::normal(double* y, size_t N)
 {
-    auto ret = zeros(N);
     const size_t N2 = N/2U;
     const double pi2 = M_PI * 2.0;
     for (size_t n=0; n<N2; n++)
@@ -61,16 +59,15 @@ WasmVector<double> Random32::normal(size_t N)
         // Box-Muller
         double radius = sqrt(-2.0*log(uniform()));
         double angle  = pi2*uniform();
-        ret[n*2]   = radius * cos(angle);
-        ret[n*2+1] = radius * sin(angle);
+        y[n*2]   = radius * cos(angle);
+        y[n*2+1] = radius * sin(angle);
     }
     if (N%2)
     {
         double radius = sqrt(-2.0*log(uniform()));
         double angle  = pi2*uniform();
-        ret[N-1]   = radius * cos(angle);
+        y[N-1]   = radius * cos(angle);
     }
-    return ret;
 }
 
 double Random32::uniform()
@@ -84,10 +81,7 @@ double Random32::uniform()
     return y * Scale;
 }
 
-WasmVector<double> Random32::uniform(size_t N)
+void Random32::uniform(double* y, size_t N)
 {
-    auto ret = zeros(N);
-    for( size_t n=0; n<N; n++ ) ret[n] = uniform();
-    return ret;
+    for( size_t n=0; n<N; n++ ) y[n] = uniform();
 }
-

@@ -26,15 +26,16 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
-#include "WasmVectors.h"
+#include <cstdint>
+#include <cstdlib>
 
 class Random32
 {
 public:
     Random32(uint32_t seed=0U);
-    WasmVector<double> normal(size_t N);
+    void normal(double* y, size_t N);
     double uniform();
-    WasmVector<double> uniform(size_t N);
+    void uniform(double* y, size_t N);
 
 private:
     uint32_t m_seed;
@@ -42,4 +43,3 @@ private:
 };
 
 #endif // RANDOM_H
-

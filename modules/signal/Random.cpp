@@ -27,6 +27,26 @@
 
 #include <cmath>
 
+#include <emscripten.h>
+
+EMSCRIPTEN_KEEPALIVE
+extern "C" void* Random32_new(uint32_t seed)
+{
+    return new Random32(seed);
+}
+
+EMSCRIPTEN_KEEPALIVE
+extern "C" void Random32_normal(Random32* ptr, double* y, size_t N)
+{
+    ptr->normal(y, N);
+}
+
+EMSCRIPTEN_KEEPALIVE
+extern "C" void Random32_uniform(Random32* ptr, double* y, size_t N)
+{
+    ptr->uniform(y, N);
+}
+
 /* https://www.jstatsoft.org/index.php/jss/article/view/v008i14/916
 Xorshift RNGs - George Marsaglia 
 

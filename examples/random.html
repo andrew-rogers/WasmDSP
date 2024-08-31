@@ -10,7 +10,7 @@
             WasmDSP.importModules(["../dist/modules/signal.js"])
                 .then(function() {
                     WasmDSP.initialise(WasmDSP.modules, function () {
-                      impulseResponse();
+                      random();
                     })
                 })
                 .catch(function(e) {
@@ -18,9 +18,9 @@
                 });
         }
         
-        function impulseResponse() {
-            let bq = new WasmDSP.modules.signal.Biquad(1,0,1,1.9,0.9);
-            let y = bq.process([1,0,0,0,0,0,0]);
+        function random() {
+            let ran = new WasmDSP.modules.signal.Random32();
+            let y = ran.normal(200);
             console.log(y);
         }
         

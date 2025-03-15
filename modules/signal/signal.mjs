@@ -1,5 +1,6 @@
 import {b64} from './signal_wasm'
 import {Biquad} from './Biquad'
+import {buttap} from './butter'
 import {FFT} from './FFT'
 import {FIR} from './FIR'
 import {Random32} from './Random'
@@ -11,5 +12,4 @@ export function onWasm(wasm) {
   Random32._wasm = wasm;
 }
 
-export {b64, Biquad, FFT, FIR, Random32};
-
+export {b64, Biquad, buttap, FFT, FIR, Random32};

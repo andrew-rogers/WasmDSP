@@ -2,29 +2,42 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
-        <script src="../dist/WasmDSP.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.7/require.min.js"></script>
     </head>
     <body>
         <script>
-        function start() {
-            WasmDSP.importModules(["../dist/modules/signal.js"])
-                .then(function() {
-                    WasmDSP.initialise(WasmDSP.modules, function () {
-                      impulseResponse();
-                    })
-                })
-                .catch(function(e) {
-                    console.log(e);
-                });
-        }
-        
-        function impulseResponse() {
-            let bq = new WasmDSP.modules.signal.Biquad(1,0,1,1.9,0.9);
-            let y = bq.process([1,0,0,0,0,0,0]);
-            console.log(y);
-        }
-        
-        start();
+
+require.config({
+  paths: {
+    mathjs:  'https://cdnjs.cloudflare.com/ajax/libs/mathjs/14.0.1/math',
+    wasmdsp: '../dist/WasmDSP',
+    signal:  '../dist/modules/signal'
+  }
+});
+
+require(['wasmdsp'], function (wasmdsp) {
+
+  wasmdsp.modules = wasmdsp.modules || {};
+
+  function start() {
+    require(['signal'], function (signal) {
+      wasmdsp.modules['signal'] = signal;
+      wasmdsp.initialise(wasmdsp.modules, function () {
+        impulseResponse();
+        console.log(signal.buttap(5));
+      });
+    });
+  }
+
+  function impulseResponse() {
+    let bq = new wasmdsp.modules.signal.Biquad(1,0,1,1.9,0.9);
+    let y = bq.process([1,0,0,0,0,0,0]);
+    console.log(y);
+  }
+
+  start();
+});
+
         </script>
     </body>
 </html>

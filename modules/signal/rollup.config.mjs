@@ -1,9 +1,12 @@
 export default {
 	input: 'signal.mjs',
+  external: ['mathjs'],
 	output: {
 		file: '../../dist/modules/signal.js',
 		format: 'umd',
-		name: 'WasmDSP.modules.signal'
-	}
+    globals: {
+      mathjs: 'mathjs'
+    },
+    name: 'WasmDSP.modules.signal'
+  }
 };
-

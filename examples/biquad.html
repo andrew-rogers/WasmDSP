@@ -25,6 +25,7 @@ require(['wasmdsp'], function (wasmdsp) {
       wasmdsp.initialise(wasmdsp.modules, function () {
         impulseResponse();
         console.log(signal.buttap(5));
+        console.log(signal.butter(4,0.1));
       });
     });
   }

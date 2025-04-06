@@ -12,3 +12,21 @@ export function buttap(N) {
 
   return [[], p, 1];
 }
+
+
+export function butter(N, wo) {
+  let [z, p, k] = buttap(N);
+
+  // Pre-warp frequencies
+  wo = math.multiply(2.0, math.tan(math.multiply(math.multiply(math.pi, wo), 0.5)));
+
+  // Scale zeros and poles
+  z = math.multiply(wo, z);
+  p = math.multiply(wo, p);
+
+  // BZT
+  z = math.dotDivide(math.add(2.0, z), math.subtract(2.0, z));
+  p = math.dotDivide(math.add(2.0, p), math.subtract(2.0, p));
+
+  return [z, p, k];
+}

@@ -14,15 +14,21 @@ export function buttap(N) {
 }
 
 
-export function butter(N, wo) {
+export function butter(N, wo, type) {
+  type = type || 'lp';
   let [z, p, k] = buttap(N);
 
   // Pre-warp frequencies
   wo = math.multiply(2.0, math.tan(math.multiply(math.multiply(math.pi, wo), 0.5)));
 
   // Scale zeros and poles
-  z = math.multiply(wo, z);
-  p = math.multiply(wo, p);
+  if (type=='lp') {
+    z = math.multiply(wo, z);
+    p = math.multiply(wo, p);
+  } else {
+    z = math.dotDivide(wo, z);
+    p = math.dotDivide(wo, p);
+  }
 
   // BZT
   z = math.dotDivide(math.add(2.0, z), math.subtract(2.0, z));

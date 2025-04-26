@@ -31,13 +31,15 @@
 class UpFIRDown
 {
 public:
-    UpFIRDown(size_t P, size_t Q, size_t max_block_size, const float * coeffs, size_t num_coeffs)
-    {
-    }
-    
+    UpFIRDown(size_t P, size_t Q, const float* coeffs, size_t num_coeffs, const float* buffer);
     size_t processBlock( const float* x, float* y, size_t num_x ); // Returns number of output samples.
 
 private:
+    size_t m_P;
+    size_t m_Q;
+    const float* m_coeffs;
+    size_t m_num_coeffs;
+    const float* m_buffer;
 };
 
 #endif // UPFIRDOWN_H

@@ -25,6 +25,11 @@
 
 #include "UpFIRDown.h"
 
+UpFIRDown::UpFIRDown(size_t P, size_t Q, const float* coeffs, size_t num_coeffs, const float* buffer)
+    : m_P(P), m_Q(Q), m_coeffs(coeffs), m_num_coeffs(num_coeffs), m_buffer(buffer)
+{
+}
+
 size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
 {
     
@@ -44,12 +49,21 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
     for (int yi = 0; yi < num_y; yi++)
     {
         // Calculate the indexes for the first element of each MAC.
-        hi_start+=Q;
-        if (hi_start>=P)
+        hi_start += m_Q;
+        if (hi_start >= m_P)
         {
-            hi_start -= P;
+            hi_start -= m_P;
             bi_start ++;
         }
+
+        // MAC.
+        float acc = 0.0F;
+        for (size_t hi = hi_start; hi < num_coeffs; hi += m_P)
+        {
+            acc += m_h[hi] * m_buffer[bi];
+            bi--;
+        }
+        y[yi] = acc;
     }
 
     return num_y;

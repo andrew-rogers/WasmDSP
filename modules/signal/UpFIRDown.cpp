@@ -25,6 +25,20 @@
 
 #include "UpFIRDown.h"
 
+#include <emscripten.h>
+
+EMSCRIPTEN_KEEPALIVE
+extern "C" void* UpFIRDown_new(size_t P, size_t Q, const float* coeffs, size_t num_coeffs, float* buffer)
+{
+    return new UpFIRDown(P, Q, coeffs, num_coeffs, buffer);
+}
+
+EMSCRIPTEN_KEEPALIVE
+extern "C" size_t UpFIRDown_processBlock(UpFIRDown* ptr, const float* x, float* y, size_t num_x)
+{
+    return ptr->processBlock(x, y, num_x);
+}
+
 UpFIRDown::UpFIRDown(size_t P, size_t Q, const float* coeffs, size_t num_coeffs, float* buffer)
     : m_P(P), m_Q(Q), m_coeffs(coeffs), m_num_coeffs(num_coeffs), m_buffer(buffer)
     , m_cnt(0U)

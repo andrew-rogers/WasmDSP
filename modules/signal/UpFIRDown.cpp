@@ -32,11 +32,11 @@ UpFIRDown::UpFIRDown(size_t P, size_t Q, const float* coeffs, size_t num_coeffs,
 
 size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
 {
-    
+
     // Copy samples into buffer.
     for (size_t n = 0U; n < num_x; n++)
     {
-        m_buffer[num_coeffs + m_cnt] = x[n];
+        m_buffer[m_num_coeffs + m_cnt] = x[n];
         m_cnt++;
     }
 
@@ -64,6 +64,15 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
             bi--;
         }
         y[yi] = acc;
+    }
+
+    // Update buffer if some output samples were produced.
+    if (num_y > 0U)
+    {
+        size_t offset = m_cnt / m_Q;
+        offset *= m_Q;
+        size_t cnt = m_cnt + num_coeffs - offset;
+        for (size_n = 0; n < cnt; n) m_buffer[n] = m_buffer[n + offset];
     }
 
     return num_y;

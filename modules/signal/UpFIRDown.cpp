@@ -25,8 +25,9 @@
 
 #include "UpFIRDown.h"
 
-UpFIRDown::UpFIRDown(size_t P, size_t Q, const float* coeffs, size_t num_coeffs, const float* buffer)
+UpFIRDown::UpFIRDown(size_t P, size_t Q, const float* coeffs, size_t num_coeffs, float* buffer)
     : m_P(P), m_Q(Q), m_coeffs(coeffs), m_num_coeffs(num_coeffs), m_buffer(buffer)
+    , m_cnt(0U)
 {
 }
 
@@ -45,8 +46,8 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
     num_y *= m_P;
 
     size_t hi_start = 0U;
-    size_t bi_start = num_coeffs;
-    for (int yi = 0; yi < num_y; yi++)
+    size_t bi_start = m_num_coeffs;
+    for (size_t yi = 0; yi < num_y; yi++)
     {
         // Calculate the indexes for the first element of each MAC.
         hi_start += m_Q;
@@ -58,9 +59,10 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
 
         // MAC.
         float acc = 0.0F;
-        for (size_t hi = hi_start; hi < num_coeffs; hi += m_P)
+        size_t bi = bi_start;
+        for (size_t hi = hi_start; hi < m_num_coeffs; hi += m_P)
         {
-            acc += m_h[hi] * m_buffer[bi];
+            acc += m_coeffs[hi] * m_buffer[bi];
             bi--;
         }
         y[yi] = acc;
@@ -71,8 +73,9 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
     {
         size_t offset = m_cnt / m_Q;
         offset *= m_Q;
-        size_t cnt = m_cnt + num_coeffs - offset;
-        for (size_n = 0; n < cnt; n) m_buffer[n] = m_buffer[n + offset];
+        size_t cnt = m_cnt + m_num_coeffs - offset;
+        for (size_t n = 0; n < cnt; n++) m_buffer[n] = m_buffer[n + offset];
+        m_cnt -= offset;
     }
 
     return num_y;

@@ -34,6 +34,12 @@ extern "C" void* UpFIRDown_new(size_t P, size_t Q, const float* coeffs, size_t n
 }
 
 EMSCRIPTEN_KEEPALIVE
+extern "C" void UpFIRDown_delete(UpFIRDown* ptr)
+{
+    delete ptr;
+}
+
+EMSCRIPTEN_KEEPALIVE
 extern "C" size_t UpFIRDown_processBlock(UpFIRDown* ptr, const float* x, float* y, size_t num_x)
 {
     return ptr->processBlock(x, y, num_x);
@@ -51,7 +57,7 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
     // Copy samples into buffer.
     for (size_t n = 0U; n < num_x; n++)
     {
-        m_buffer[m_num_coeffs + m_cnt] = x[n];
+        m_buffer[m_num_coeffs + m_cnt - 1U] = x[n];
         m_cnt++;
     }
 
@@ -60,16 +66,9 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
     num_y *= m_P;
 
     size_t hi_start = 0U;
-    size_t bi_start = m_num_coeffs;
-    for (size_t yi = 0; yi < num_y; yi++)
+    size_t bi_start = m_num_coeffs - 1U;
+    for (size_t yi = 0U; yi < num_y; yi++)
     {
-        // Calculate the indexes for the first element of each MAC.
-        hi_start += m_Q;
-        if (hi_start >= m_P)
-        {
-            hi_start -= m_P;
-            bi_start ++;
-        }
 
         // MAC.
         float acc = 0.0F;
@@ -80,6 +79,14 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
             bi--;
         }
         y[yi] = acc;
+
+        // Calculate the indexes for the first element of next MAC.
+        hi_start += m_Q;
+        if (hi_start >= m_P)
+        {
+            hi_start -= m_P;
+            bi_start ++;
+        }
     }
 
     // Update buffer if some output samples were produced.
@@ -87,7 +94,7 @@ size_t UpFIRDown::processBlock( const float* x, float* y, size_t num_x )
     {
         size_t offset = m_cnt / m_Q;
         offset *= m_Q;
-        size_t cnt = m_cnt + m_num_coeffs - offset;
+        size_t cnt = m_cnt + m_num_coeffs - offset - 1U;
         for (size_t n = 0; n < cnt; n++) m_buffer[n] = m_buffer[n + offset];
         m_cnt -= offset;
     }

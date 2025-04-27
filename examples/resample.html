@@ -262,8 +262,54 @@ require(['wasmdsp'], function (wasmdsp) {
 
   function impulseResponse() {
     let cfuncs = wasmdsp.modules.signal.wasm.exports;
+    let buffer = wasmdsp.modules.signal.wasm.exports.memory.buffer;
+
+    // Put filter coefficients in WASM memory.
     let coeffs = getCoeffs();
     let ptr_coeffs = cfuncs.Buffer(coeffs.length);
+    let buf_coeffs = new Float32Array(buffer, ptr_coeffs, coeffs.length);
+    for (let i=0; i<coeffs.length; i++) buf_coeffs[i] = coeffs[i];
+
+    // Create a buffer for the delay line. Must be filter size + max input length - 1.
+    let ptr_delay_line = cfuncs.Buffer(coeffs.length + 128 - 1);
+
+    // UpFIRDown_new(size_t P, size_t Q, const float* coeffs, size_t num_coeffs, float* buffer).
+    let ptr = cfuncs.UpFIRDown_new(3, 2, ptr_coeffs, coeffs.length, ptr_delay_line)
+
+    // Create a test input buffer.
+    let ptr_x = cfuncs.Buffer(10);
+    let buf_x = new Float32Array(buffer, ptr_x, 10);
+    let vals = [1,0,0,0,0,0,0,0,0,0];
+    for (let i=0; i<10; i++)buf_x[i] = vals[i];
+
+    // Output buffer.
+    let ptr_y = cfuncs.Buffer(20);
+    let buf_y = new Float32Array(buffer, ptr_y, 20);
+
+    // Run the resampler.
+    let num_y = cfuncs.UpFIRDown_processBlock(ptr, ptr_x, ptr_y, buf_x.length)
+
+    // Dump the output.
+    let y = [...buf_y];
+    y = y.slice(0,num_y);
+    console.log(y);
+
+    let output = [];
+    output.push(...y);
+
+    // Run sampler with zeros to complete complete response.
+    for (let i=0; i<buf_x.length; i++) buf_x[i] = 0;
+    for (let i=0; i<100; i++) {
+      num_y = cfuncs.UpFIRDown_processBlock(ptr, ptr_x, ptr_y, buf_x.length)
+      y = [...buf_y];
+      y = y.slice(0,num_y);
+      output.push(...y);
+    }
+
+    console.log(output);
+
+    // Delete the resampler.
+    cfuncs.UpFIRDown_delete(ptr);
   }
 
   start();

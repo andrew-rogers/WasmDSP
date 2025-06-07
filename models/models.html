@@ -12,14 +12,14 @@ require(['models'], function (models) {
   function checkArrays(expected, actual, tol) {
     if (expected.length != actual.length) return false;
     for (let n=0; n<expected.length; n++) {
-      const e = Math.abs((expected[n] - actual[n]) / expected[n]);
+      const e = Math.abs(expected[n] - actual[n]);
       if (e > tol) return false;
     }
     return true;
   }
 
   function checkNumber(expected, actual, tol) {
-    const e = Math.abs((expected - actual) / expected);
+    const e = Math.abs(expected - actual);
     if (e > tol) return false;
     return true;
   }
@@ -29,13 +29,36 @@ require(['models'], function (models) {
 
   x = [2.2,-1.2,1.2,8,1,0,0,0];
   h = [1.2, 3.4, 5.6];
-  expected = [2.64, 6.04, 9.68, 6.96, 35.1, 48.2, 5.6, 0];
+  expected = [2.64, 6.04, 9.68, 6.96, 35.12, 48.2, 5.6, 0];
   let actual = models.fir(h,x);
   console.log("fir", checkArrays(expected, actual, 0.01));
 
   expected = 3.02;
   actual = models.rms(x);
   console.log("rms", checkNumber(expected, actual, 0.01));
+
+  x = [1,2,3,4];
+  expected = [0,1.5,3];
+  actual = models.resampleLinear(0.666667,x);
+  console.log("resampleLinear", checkArrays(expected, actual, 0.001));
+
+  let nx = 107;
+  let ny = 73;
+  let pi2 = Math.PI * 2;
+  x = [];
+  expected = [];
+  for (let n=1; n<nx; n++) x.push(Math.sin(pi2 * n / nx));
+  for (let n=0; n<ny; n++) expected.push(Math.sin(pi2 * n / ny));
+  actual = models.resampleLinear(ny/nx, x);
+  console.log("resampleLinear", checkArrays(expected.slice(0,actual.length), actual, 0.001));
+
+  ny = 139;
+  x = [];
+  expected = [];
+  for (let n=1; n<nx; n++) x.push(Math.sin(pi2 * n / nx));
+  for (let n=0; n<ny; n++) expected.push(Math.sin(pi2 * n / ny));
+  actual = models.resampleLinear(ny/nx, x);
+  console.log("resampleLinear", checkArrays(expected.slice(0,actual.length), actual, 0.001));
 
 });
 

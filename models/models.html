@@ -8,7 +8,35 @@
         <script>
 
 require(['models'], function (models) {
-  window.fir = models.fir; // Make fir global.
+
+  function checkArrays(expected, actual, tol) {
+    if (expected.length != actual.length) return false;
+    for (let n=0; n<expected.length; n++) {
+      const e = Math.abs((expected[n] - actual[n]) / expected[n]);
+      if (e > tol) return false;
+    }
+    return true;
+  }
+
+  function checkNumber(expected, actual, tol) {
+    const e = Math.abs((expected - actual) / expected);
+    if (e > tol) return false;
+    return true;
+  }
+
+  let x = [];
+  let h = [];
+
+  x = [2.2,-1.2,1.2,8,1,0,0,0];
+  h = [1.2, 3.4, 5.6];
+  expected = [2.64, 6.04, 9.68, 6.96, 35.1, 48.2, 5.6, 0];
+  let actual = models.fir(h,x);
+  console.log("fir", checkArrays(expected, actual, 0.01));
+
+  expected = 3.02;
+  actual = models.rms(x);
+  console.log("rms", checkNumber(expected, actual, 0.01));
+
 });
 
         </script>

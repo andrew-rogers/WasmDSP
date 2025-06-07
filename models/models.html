@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+        <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.7/require.min.js"></script>
+    </head>
+    <body>
+        <script>
+
+require(['models'], function (models) {
+  window.fir = models.fir; // Make fir global.
+});
+
+        </script>
+    </body>
+</html>

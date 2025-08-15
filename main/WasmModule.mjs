@@ -53,6 +53,12 @@ WasmModule.prototype.cfunc = function( func_name ) {
     console.log("Wasm not initialised."); // Re-defined in initialise().
 };
 
+WasmModule.prototype.getArray = function (name) {
+  let arrs = this.arrays;
+  arrs[name] = arrs[name] || [];
+  return arrs[name];
+};
+
 WasmModule.prototype.initialise = function (module, postInit) {
 
     module.arrays = module.arrays || {};

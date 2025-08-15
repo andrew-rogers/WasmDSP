@@ -7,10 +7,10 @@ KISSFFT_DIR = ../../../kissfft
 DISTMOD = $(WASMDSP)/dist/modules
 JS = $(DISTMOD)/$(TARGET).js
 
-OBJS = Biquad.o Buffer.o FFT.o UpFIRDown.o kiss_fft.o Random.o
+OBJS = Biquad.o Buffer.o FFT.o UpFIRDown.o kiss_fft.o Random.o sosfilt.o
 
-CXXFLAGS += -I $(KISSFFT_DIR)
-LDFLAGS += --no-entry
+CXXFLAGS += -I $(KISSFFT_DIR) -I $(WASMDSP)/lib/WasmDSP/
+LDFLAGS += --no-entry -L $(WASMDSP)/lib/WasmDSP/ -l WasmDSP
 
 
 RM = $(EMSDK_NODE) $(WASMDSP)/tools/rm.mjs # Windows del doesn't like forward slashes, use simple rm node script.

@@ -30,9 +30,24 @@
 EMSCRIPTEN_KEEPALIVE
 extern "C" void sosfilt()
 {
-    float vals[] = {1.0, 2.2, 4.1};
-    WasmDSP::JSArray a("y");
-    a.write(vals, 3);
-    SOSFiltAlloc<2> filt(vals);
+    WasmDSP::JSArray sos("sos");
+    WasmDSP::JSArray x("x");
+    WasmDSP::JSArray y("y");
+
+    size_t num_sections = sos.size() / 5U;
+    float coeffs[num_sections * 5U];
+    float state[num_sections * 2U];
+    size_t nr = sos.read(coeffs, num_sections * 5U);
+
+    SOSFilt filt(num_sections, coeffs, state);
+
+    const size_t BlockSize = 64U;
+    float samples[BlockSize];
+    float output[BlockSize];
+    do {
+        nr = x.read(samples, BlockSize);
+        filt.processBlock(samples, output, nr);
+        y.write(output, nr);
+    } while (nr == BlockSize);
 }
 

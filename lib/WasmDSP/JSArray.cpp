@@ -31,7 +31,7 @@ EM_JS( int32_t, jsArrayOpen, (const char* name), {
     // Body defined in runtime.
 });
 
-EM_JS( int32_t, jsArrayRead, (int32_t id, int32_t type, float* ptr, uint32_t index, uint32_t cnt), {
+EM_JS( int32_t, jsArrayRead, (int32_t id, int32_t type, void* ptr, uint32_t index, uint32_t cnt), {
     // Body defined in runtime.
 });
 
@@ -50,6 +50,13 @@ int32_t jsArrayOpen(const char* name)
 int32_t JSArray::read(float* ptr, uint32_t cnt)
 {
     int32_t nread = jsArrayRead(m_id, Type::FLOAT32, ptr, m_pos, cnt);
+    if (nread > 0) m_pos += nread;
+    return nread;
+}
+
+int32_t JSArray::read(char* ptr, uint32_t cnt)
+{
+    int32_t nread = jsArrayRead(m_id, Type::STRING, ptr, m_pos, cnt);
     if (nread > 0) m_pos += nread;
     return nread;
 }

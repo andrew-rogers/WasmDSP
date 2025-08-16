@@ -31,4 +31,18 @@ SOSFilt::SOSFilt(size_t num_sections, const float* coeffs, float* state) : m_num
     
 void SOSFilt::processBlock( const float* x, float* y, size_t N )
 {
+    for (size_t n = 0U; n < N; n++)
+    {
+        float xn = x[n];
+        for (size_t s = 0U; s < m_num_sections; s++)
+        {
+            const float* c = &m_coeffs[s * 5U];
+            float* w = &m_state[s * 2U];
+            float w0 = xn - c[3] * w[0] - c[4] * w[1];
+            xn  = c[0] * w0 + c[1] * w[0] + c[2] * w[1];
+            w[1] = w[0];
+            w[0] = w0;
+        }
+        y[n] = xn;
+    }
 }

@@ -7,7 +7,7 @@ KISSFFT_DIR = ../../../kissfft
 DISTMOD = $(WASMDSP)/dist/modules
 JS = $(DISTMOD)/$(TARGET).js
 
-OBJS = Biquad.o Buffer.o FFT.o UpFIRDown.o kiss_fft.o Random.o sosfilt.o
+OBJS = Biquad.o Buffer.o FFT.o UpFIRDown.o kiss_fft.o Random.o SOSFilt.o exports.o
 
 CXXFLAGS += -I $(KISSFFT_DIR) -I $(WASMDSP)/lib/WasmDSP/
 LDFLAGS += --no-entry -L $(WASMDSP)/lib/WasmDSP/ -l WasmDSP

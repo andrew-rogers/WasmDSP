@@ -1,5 +1,5 @@
 /*
- * WasmDSP - Filter using Second Order Sections (SOS)
+ * WasmDSP - Exported functions
  * Copyright (C) 2025  Andrew Rogers
  *
  * SPDX-License-Identifier: MIT
@@ -24,6 +24,7 @@
  */
 
 #include "JSArray.h"
+#include "SOSFilt.h"
 #include <emscripten.h>
 
 EMSCRIPTEN_KEEPALIVE
@@ -32,5 +33,6 @@ extern "C" void sosfilt()
     float vals[] = {1.0, 2.2, 4.1};
     WasmDSP::JSArray a("y");
     a.write(vals, 3);
+    SOSFiltAlloc<2> filt(vals);
 }
 

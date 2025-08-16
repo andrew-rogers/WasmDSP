@@ -191,6 +191,10 @@ WasmModule.prototype._createImports = function() {
         return arr.length;
     };
 
+    env.jsArraySize = function( id ) {
+        return that.scope.byId(id).length;
+    };
+
     env.jsArrayWrite = function( id, type, ptr, cnt) {
         const vals = that.read('F32', ptr, cnt);
         that.scope.byId(id).push(...vals);

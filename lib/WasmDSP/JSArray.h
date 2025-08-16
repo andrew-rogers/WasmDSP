@@ -47,6 +47,8 @@ public:
     int32_t read(float* ptr, uint32_t cnt);
     int32_t read(char* ptr, uint32_t cnt);
 
+    int32_t size();
+
     void write(const float* ptr, uint32_t cnt)
     {
         jsArrayWrite(m_id, Type::FLOAT32, ptr, cnt);

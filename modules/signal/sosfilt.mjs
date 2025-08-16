@@ -5,8 +5,8 @@ export function onWasm(w) {
 }
 
 export function sosfilt(sos, x) {
-  let y= wasm.getArray('y');
-  y.length = 0;
-  wasm.callCFunc('sosfilt');
-  return y; 
+  let obj = {sos, x};
+  let scope = wasm.newScope(obj);
+  wasm.callCFunc('sosfilt', scope);
+  return obj.y;
 }

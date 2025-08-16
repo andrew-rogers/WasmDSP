@@ -25,9 +25,30 @@
  *
  */
 
+var Scope = function(obj) {
+  this.obj = obj || {};
+  this.list = [];
+};
+
+Scope.prototype.byId = function (id) {
+  return this.list[id];
+};
+
+Scope.prototype.getArray = function (name) {
+  let arrs = this.obj;
+  arrs[name] = arrs[name] || []; // Create array if it doesn't exist.
+  return arrs[name];
+};
+
+Scope.prototype.open = function (name) {
+  let arr = this.getArray(name);
+  this.list.push(arr);
+  return this.list.length - 1;
+};
+
+
 var WasmModule = function() {
-    this.arrays = {};
-    this.array_list = [];
+    this.default_scope = new Scope();
     this.module = {};
     this._createImports();
     this.handlers = {};
@@ -53,16 +74,12 @@ WasmModule.prototype.cfunc = function( func_name ) {
     console.log("Wasm not initialised."); // Re-defined in initialise().
 };
 
-WasmModule.prototype.getArray = function (name) {
-  let arrs = this.arrays;
-  arrs[name] = arrs[name] || [];
-  return arrs[name];
-};
 
 WasmModule.prototype.initialise = function (module, postInit) {
 
     module.arrays = module.arrays || {};
-    this.arrays = module.arrays;
+    this.default_scope = new Scope(module.arrays);
+    this.scope = this.default_scope;
 
     let imports = module.imports;
     let env = this.module.imports.env;
@@ -81,9 +98,11 @@ WasmModule.prototype.initialise = function (module, postInit) {
     this.cfunc = function (func_name) {
         return mod.exports[func_name];
     };
-    this.callCFunc = function (func_name) {
-        var func = mod.exports[func_name];
-        func();
+    this.callCFunc = function (func_name, scope) {
+      this.scope = scope || this.default_scope;
+      var func = mod.exports[func_name];
+      func();
+      this.scope = this.default_scope;
     }
 
     // Instantiate the wasm.
@@ -100,6 +119,10 @@ WasmModule.prototype.initialise = function (module, postInit) {
         that.exports = mod.exports;
         if (postInit) postInit();
     });
+};
+
+WasmModule.prototype.newScope = function(obj) {
+  return new Scope(obj);
 };
 
 WasmModule.prototype.read = function( type, address, num ) {
@@ -159,20 +182,18 @@ WasmModule.prototype._createImports = function() {
 
     env.jsArrayOpen = function( utf8_name ) {
         const name = that.readString(utf8_name);
-        that.arrays[name] = that.arrays[name] || [];
-        that.array_list.push(that.arrays[name]);
-        return that.array_list.length - 1;
+        return that.scope.open(name);
     };
 
     env.jsArrayRead = function( id, type, ptr, index, cnt ) {
-        const arr = that.array_list[id].slice(index, index+cnt);
+        const arr = that.scope.byId(id).slice(index, index+cnt);
         that.write( 'F32', arr, ptr );
         return arr.length;
     };
 
     env.jsArrayWrite = function( id, type, ptr, cnt) {
         const vals = that.read('F32', ptr, cnt);
-        that.array_list[id].push(...vals);
+        that.scope.byId(id).push(...vals);
     };
 
     env.jsEval = function( utf8_src ) {

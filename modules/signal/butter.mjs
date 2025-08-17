@@ -34,5 +34,12 @@ export function butter(N, wo, type) {
   z = math.dotDivide(math.add(2.0, z), math.subtract(2.0, z));
   p = math.dotDivide(math.add(2.0, p), math.subtract(2.0, p));
 
+  // Add the missing zeros.
+  if (type=='lp') {
+    while(z.length < N) z.push(math.complex(-1,0));
+  } else {
+    while(z.length < N) z.push(math.complex(1,0));
+  }
+
   return [z, p, k];
 }

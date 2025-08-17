@@ -1,5 +1,10 @@
 import * as math from 'mathjs'
 
+function root2quad(x) {
+  // Convert a complex root and its conjugate to a quadratic with real coefficients.
+  return [1, -2*x.re, x.re*x.re + x.im*x.im];
+}
+
 export function buttap(N) {
   // Prototype analogue Butterworth low pass filter has poles on a unit circle.
   const j = math.complex(0,1);
@@ -12,7 +17,6 @@ export function buttap(N) {
 
   return [[], p, 1];
 }
-
 
 export function butter(N, wo, type) {
   type = type || 'lp';

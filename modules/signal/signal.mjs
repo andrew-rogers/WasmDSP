@@ -14,6 +14,7 @@ export function onWasm(wasm) {
   mod_sosfilt.onWasm(wasm);
 }
 
-const sosfilt = mod_sosfilt.sosfilt;
+const sosfilt  = mod_sosfilt.sosfilt;
+const sosfreqz = mod_sosfilt.sosfreqz;
 
-export {b64, Biquad, buttap, butter, FFT, FIR, Random32, sosfilt};
+export {b64, Biquad, buttap, butter, FFT, FIR, Random32, sosfilt, sosfreqz};

@@ -1,6 +1,6 @@
 import {b64} from './signal_wasm'
 import {Biquad} from './Biquad'
-import {buttap, butter} from './butter'
+import {buttap, butter, butter_zpk} from './butter'
 import {FFT} from './FFT'
 import {FIR} from './FIR'
 import {Random32} from './Random'
@@ -17,4 +17,4 @@ export function onWasm(wasm) {
 const sosfilt  = mod_sosfilt.sosfilt;
 const sosfreqz = mod_sosfilt.sosfreqz;
 
-export {b64, Biquad, buttap, butter, FFT, FIR, Random32, sosfilt, sosfreqz};
+export {b64, Biquad, buttap, butter, butter_zpk, FFT, FIR, Random32, sosfilt, sosfreqz};

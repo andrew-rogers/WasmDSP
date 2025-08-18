@@ -19,6 +19,18 @@ export function buttap(N) {
 }
 
 export function butter(N, wo, type) {
+  let [z,p,k] = butter_zpk(N, wo, type);
+  const odd = N%2;
+  let Np = (N-odd) / 2;
+  let sos = [];
+  for (let n=0; n<Np; n++) {
+    sos.push([...root2quad(z[n]), ...root2quad(p[n])]);
+  }
+  if(odd) sos.push([1, -z[Np].re, 0, 1, -p[Np].re, 0]);
+  return sos;
+}
+
+export function butter_zpk(N, wo, type) {
   type = type || 'lp';
   let [z, p, k] = buttap(N);
 

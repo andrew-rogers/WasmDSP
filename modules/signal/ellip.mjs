@@ -128,7 +128,10 @@ export function R(N, xi, x) {
   let m = 1 / (xi * xi);
   let Km = K(m);
   let odd = N%2;
-  for (let n = 1; n <= (N-odd); n++) u.push(Km * (2 * n - 1) / N);
+  for (let n = 1; n <= N; n++) {
+    let d = 2 * n - 1;
+    if (d != N) u.push(Km * d / N);
+  }
   let scdp = Ellip.scdp(u, m);
   let cd = scdp.map((o) => o.cn / o.dn);
   let z = [...cd];

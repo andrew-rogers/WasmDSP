@@ -73,7 +73,7 @@ export class Ellip {
     let nr = scd1.cn * scd2.cn;
     let ni = -scd1.sn * scd1.dn * scd2.sn * scd2.dn;
     let dr = scd1.dn * scd2.cn * scd2.dn;
-    let di = -m * scd1.sn * scd1.cn * scd2.sn;
+    let di = -this.m * scd1.sn * scd1.cn * scd2.sn;
     return this.#div_c([nr,ni],[dr,di]);
   }
 
@@ -219,8 +219,8 @@ export function R(N, xi, x) {
     let d = 2 * n - 1;
     if (d != N) u.push(Km * d / N);
   }
-  let scdp = Ellip.scdp(u, m);
-  let cd = scdp.map((o) => o.cn / o.dn);
+  let scdp_vals = scdp(u, m);
+  let cd = scdp_vals.map((o) => o.cn / o.dn);
   let z = [...cd];
   if (odd) z.push(0);
   let p = cd.map((v) => xi / v)

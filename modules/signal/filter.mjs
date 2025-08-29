@@ -27,6 +27,22 @@
 
 import {Ellip, R, K, F} from './ellip'
 
+export function ellip(N, rp, rs, fc, bt, options) {
+  // TODO: Check band
+  // TODO: Check options, {analogue: false, zpk: true} etc.
+  // TODO: Pre-warp
+
+  // Prototype
+  let [z, p, k] = ellipap(N, rp, rs);
+
+  // Frequency scale
+  [z, p, k] = frequencyScale(z, p, k, fc, bt);
+
+  // TODO: BZT
+
+  return [z, p, k];
+}
+
 export function ellipap(N, rp, rs) {
   // Prototype analogue Elliptic low pass filter.
 
@@ -52,4 +68,42 @@ export function ellipap(N, rp, rs) {
   let p = w.map((w_val) => el.cd_c(w_val));
 
   return [z, p, 1];
+}
+
+function complexDiv(num, den) {
+  const a = num[0];
+  const b = num[1];
+  const c = den[0];
+  const d = den[1];
+  //
+  //   a + ib       a + ib     c - id       ac - iad + ibc - iibd       ac + bd + i(bc-ad)
+  //  --------  =  -------- * --------  =  -----------------------  =  --------------------
+  //   c + id       c + id     c - id       cc - icd + icd - iidd            cc + dd
+  //
+  const scale = 1 / (c*c + d*d);
+  const r = a*c + b*d;
+  const i = b*c - a*d;
+  return [scale*r, scale*i];
+}
+
+function frequencyScale(z, p, k, fc, bt) {
+  bt = bt || 'L'; // Default to lowpass.
+
+  // find first occurance of L,H,P or S
+  // Lowpass Highpass bandPass bandStop
+  bt = bt.toUpperCase().match(/[LHPS]/g);
+  if (bt.length == 0) bt = 'L';
+  else bt = bt[0];
+
+  // Scale zeros and poles
+  if (bt == 'H') { // TODO: 'P' and 'S'
+    z = z.map((v) => complexDiv([fc, 0], v));
+    p = p.map((v) => complexDiv([fc, 0], v));
+  } else {
+    // Lowpass default.
+    z = z.map((v) => [fc * v[0], fc * v[1]]);
+    p = p.map((v) => [fc * v[0], fc * v[1]]);
+  }
+
+  return [z, p, k];
 }

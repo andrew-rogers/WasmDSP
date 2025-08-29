@@ -66,6 +66,7 @@ export function ellipap(N, rp, rs) {
   for (let n = 0; n < N; n++) w.push([(n * 2 + 1) * Kxi / N, wi]);
 
   let p = w.map((w_val) => el.cd_c(w_val));
+  p = p.map((v) => [v[1], v[0]]); // Swap real and imaginary.
 
   return [z, p, 1];
 }
@@ -99,6 +100,7 @@ function frequencyScale(z, p, k, fc, bt) {
   if (bt == 'H') { // TODO: 'P' and 'S'
     z = z.map((v) => complexDiv([fc, 0], v));
     p = p.map((v) => complexDiv([fc, 0], v));
+    while (z.length < p.length) z.push([0,0]); // Move zeros from infinity to zero.
   } else {
     // Lowpass default.
     z = z.map((v) => [fc * v[0], fc * v[1]]);

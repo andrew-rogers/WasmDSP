@@ -40,11 +40,13 @@ export function ellip(N, rp, rs, fc, bt, options) {
 export function ellipap(N, rp, rs) {
   // Prototype analogue Elliptic low pass filter.
 
-  let eps = 0.5088;  // TODO: calc from riiple spec.
-  let xi = 1.218699; // TODO: calc from riiple spec.
+  rp = 10 ** (-rp / 20);
+  rs = 10 ** (-rs / 20);
+  let eps = Math.sqrt(1 / (rp * rp) - 1);
+  let Lt  = Math.sqrt(1 / (rs * rs) - 1) / eps;
 
   // Zeros are the poles of the ellitic rational function mapped to the imaginary axis.
-  let r = R(N, xi, [0]);
+  let [r,xi] = findR(N, Lt);
   let z = r.p.map((v) => [0, v])
 
   // Poles are from the zeros of the elliptic rational function with its argument being the complex frequency s = jw.
@@ -96,6 +98,32 @@ function complexDiv(num, den) {
   const r = a*c + b*d;
   const i = b*c - a*d;
   return [scale*r, scale*i];
+}
+
+function findR(N, L) {
+  let xi_min = 1 + Number.EPSILON;
+  let xi = xi_min;
+
+  // Double xi until past target.
+  for (let n = 0; n < 10; n++) {
+    let r = R(N, xi, [0]);
+    console.log({r,xi});
+    if (r.L >= L) break;
+    xi = xi * 2;
+  }
+
+  // Binary search.
+  let ll = xi / 2;
+  if (ll < xi_min) ll = xi_min;
+  let ul = xi;
+  let r = {};
+  for (let n = 0; n < 60; n++) {
+    r = R(N, xi, [0]);
+    if(r.L < L) ll = xi;
+    else ul = xi;
+    xi = (ll + ul) / 2;
+  }
+  return [r, xi];
 }
 
 function frequencyScale(z, p, k, fc, bt, opt) {

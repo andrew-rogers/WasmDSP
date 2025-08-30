@@ -71,6 +71,7 @@ function bzt(z, p, k) {
   }
   z = z.map(f);
   p = p.map(f);
+  while (z.length < p.length) z.push([-1,0]) // Move zeros at infinity to -1
   return [z, p, k];
 }
 
@@ -129,12 +130,40 @@ function preWarp(f) {
   return 2 * Math.tan(Math.PI * f * 0.5);
 }
 
-export function zpk2sos(z,p,k) {
+function sort(r) {
+  // If odd number of roots put real root last.
+  if ((r.length % 2) == 0) return r
+
+  // Find root with smallest absolute imaginary.
+  let min = r[0][1];
+  let im = 0;
+  for (let n = 0; n < r.length; n++) {
+    let val = Math.abs(r[n][1]);
+    if (val < min) {
+      min = val;
+      im = n;
+    }
+  }
+
+  let ret = [];
+  for (let n = 0; n < r.length; n++) {
+    if (n != im) ret.push(r[n]);
+  }
+  ret.push(r[im]);
+
+  return ret;
+}
+
+function zpk2sos(z,p,k) {
 
   // Create unity SOS array.
   let sos = [];
   while ((sos.length * 2) < z.length) sos.push([1, 0, 0, 1, 0, 0]);
   while ((sos.length * 2) < p.length) sos.push([1, 0, 0, 1, 0, 0]);
+
+  // Sort roots
+  z = sort(z);
+  p = sort(p);
 
   // Modify sections for zeros
   let N = z.length;
@@ -144,7 +173,7 @@ export function zpk2sos(z,p,k) {
     sos[n][1] = -2 * z[n][0];
     sos[n][2] = (z[n][0] ** 2) + (z[n][1] ** 2);
   }
-  if(odd) sos[Npairs][1] = -z[Npairs][0];
+  if(odd) sos[Npairs][1] = -z[Npairs*2][0];
 
   // Modify sections for poles
   N = p.length;
@@ -154,7 +183,7 @@ export function zpk2sos(z,p,k) {
     sos[n][4] = -2 * p[n][0];
     sos[n][5] = (p[n][0] ** 2) + (p[n][1] ** 2);
   }
-  if(odd) sos[Npairs][4] = -p[Npairs][0];
+  if(odd) sos[Npairs][4] = -p[Npairs*2][0];
 
   return sos;
 }

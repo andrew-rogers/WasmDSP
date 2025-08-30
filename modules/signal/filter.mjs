@@ -64,7 +64,14 @@ export function ellipap(N, rp, rs) {
   let p = w.map((w_val) => el.cd_c(w_val));
   p = p.map((v) => [v[1], v[0]]); // Swap real and imaginary.
 
-  return [z, p, 1];
+  // Compute gain at jw = 0
+  let hz = 1;
+  let hp = rp;
+  if (N%2) hp = 1;
+  z.forEach((v) => hz = hz * Math.sqrt(v[0]*v[0] + v[1]*v[1]));
+  p.forEach((v) => hp = hp * Math.sqrt(v[0]*v[0] + v[1]*v[1]));
+
+  return [z, p, hp / hz];
 }
 
 function bzt(z, p, k) {
@@ -212,6 +219,11 @@ function zpk2sos(z,p,k) {
     sos[n][5] = (p[n][0] ** 2) + (p[n][1] ** 2);
   }
   if(odd) sos[Npairs][4] = -p[Npairs*2][0];
+
+  let l = sos.length - 1;
+  sos[l][0] *= k;
+  sos[l][1] *= k;
+  sos[l][2] *= k;
 
   return sos;
 }

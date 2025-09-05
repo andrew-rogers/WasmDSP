@@ -136,7 +136,6 @@ function findR(N, L) {
   // Double xi until past target.
   for (let n = 0; n < 10; n++) {
     let r = R(N, xi, [0]);
-    console.log({r,xi});
     if (r.L >= L) break;
     xi = xi * 2;
   }
@@ -192,7 +191,7 @@ function sort(r) {
   if ((r.length % 2) == 0) return r
 
   // Find root with smallest absolute imaginary.
-  let min = r[0][1];
+  let min = Math.abs(r[0][1]);
   let im = 0;
   for (let n = 0; n < r.length; n++) {
     let val = Math.abs(r[n][1]);

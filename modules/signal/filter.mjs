@@ -97,12 +97,22 @@ export function ellipap(N, rp, rs) {
 }
 
 function bzt(z, p, k) {
+
+  // Gain change compensation.
+  let kz = [1, 0];
+  z.forEach((v) => kz = complexMult(kz,[2 - v[0], -v[1]]));
+  let kp = [1, 0];
+  p.forEach((v) => kp = complexMult(kp,[2 - v[0], -v[1]]));
+  k = k * complexDiv(kz, kp)[0];
+
+  // Bilinear Z-transform
   function f(a) {
     return complexDiv([2 + a[0], a[1]], [2 - a[0], -a[1]])
   }
   z = z.map(f);
   p = p.map(f);
   while (z.length < p.length) z.push([-1,0]) // Move zeros at infinity to -1
+
   return [z, p, k];
 }
 
@@ -127,6 +137,10 @@ function complexDiv(num, den) {
   const r = a*c + b*d;
   const i = b*c - a*d;
   return [scale*r, scale*i];
+}
+
+function complexMult(a, b) {
+  return [a[0]*b[0] - a[1]*b[1], a[0]*b[1] + a[1]*b[0]];
 }
 
 function findR(N, L) {
@@ -174,6 +188,7 @@ function frequencyScale(z, p, k, fc, bt, opt) {
     // Lowpass default.
     z = z.map((v) => [fc * v[0], fc * v[1]]);
     p = p.map((v) => [fc * v[0], fc * v[1]]);
+    k = k * (fc ** (p.length - z.length));
   }
 
   if (opt.digital) [z, p, k] = bzt(z, p, k);

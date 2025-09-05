@@ -27,6 +27,28 @@
 
 import {Ellip, R, K, F} from './ellip'
 
+export function butter(N, fc, bt, options) {
+  let opt = checkOptions(options);
+
+  // Prototype
+  let [z, p, k] = buttap(N);
+
+  // Frequency scale
+  return frequencyScale(z, p, k, fc, bt, opt);
+}
+
+export function buttap(N) {
+  // Prototype analogue Butterworth low pass filter has poles on a unit circle.
+  let p=[];
+  for (let n=0; n<N; n++) {
+    const angle = ((n + 0.5) / N + 0.5) * Math.PI;
+    p.push([Math.cos(angle), Math.sin(angle)]);
+  }
+  if (N%2==1) p[(N-1)/2] = [-1, 0];
+
+  return [[], p, 1];
+}
+
 export function ellip(N, rp, rs, fc, bt, options) {
   let opt = checkOptions(options);
 

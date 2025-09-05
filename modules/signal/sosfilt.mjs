@@ -62,7 +62,7 @@ export function sosfreqz(sos, w) {
   if (typeof w === 'number') {
     const N = w;
     w = [];
-    const step = Math.PI * 2 / N;
+    const step = Math.PI / N;
     for(let n=0; n < N; n++) w.push(n*step);
   }
   let h = [];

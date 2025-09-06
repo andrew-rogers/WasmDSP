@@ -181,6 +181,15 @@ function frequencyScale(z, p, k, fc, bt, opt) {
 
   // Scale zeros and poles
   if (bt == 'H') { // TODO: 'P' and 'S'
+
+    // Gain compensation.
+    let kz = [1, 0];
+    z.forEach((v) => kz = complexMult(kz, [-v[0], -v[1]]));
+    let kp = [1, 0];
+    p.forEach((v) => kp = complexMult(kp, [-v[0], -v[1]]));
+    k = k * complexDiv(kz, kp)[0];
+
+    // Scale roots.
     z = z.map((v) => complexDiv([fc, 0], v));
     p = p.map((v) => complexDiv([fc, 0], v));
     while (z.length < p.length) z.push([0,0]); // Move zeros from infinity to zero.

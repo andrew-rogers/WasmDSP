@@ -191,7 +191,7 @@ function frequencyScale(z, p, k, fc, bt, opt) {
     else fc = preWarp(fc);
   }
 
-  function bandTransform (r, ww) {
+  function bandTransform(r, ww) {
     let ret = [];
     r.forEach((v) => {
       let rr = complexMult(v,v);
@@ -202,16 +202,7 @@ function frequencyScale(z, p, k, fc, bt, opt) {
     return ret;
   }
 
-  function lpscale (z, p, k, fc) {
-    k = k * (fc ** (p.length - z.length));
-    z = z.map((v) => [fc * v[0], fc * v[1]]);
-    p = p.map((v) => [fc * v[0], fc * v[1]]);
-    return [z, p, k];
-  }
-
-  // Scale zeros and poles
-  if (bt == 'H') { // TODO: 'P' and 'S'
-
+  function hpscale(z, p, k, fc) {
     // Gain compensation.
     let kz = [1, 0];
     z.forEach((v) => kz = complexMult(kz, [-v[0], -v[1]]));
@@ -222,6 +213,19 @@ function frequencyScale(z, p, k, fc, bt, opt) {
     // Scale roots.
     z = z.map((v) => complexDiv([fc, 0], v));
     p = p.map((v) => complexDiv([fc, 0], v));
+    return [z, p, k];
+  }
+
+  function lpscale(z, p, k, fc) {
+    k = k * (fc ** (p.length - z.length));
+    z = z.map((v) => [fc * v[0], fc * v[1]]);
+    p = p.map((v) => [fc * v[0], fc * v[1]]);
+    return [z, p, k];
+  }
+
+  // Scale zeros and poles
+  if (bt == 'H') { // TODO: 'P' and 'S'
+    [z, p, k] = hpscale(z, p, k,fc);
     while (z.length < p.length) z.push([0,0]); // Move zeros from infinity to zero.
   } else if (bt == 'P') {
     let ww = fc[0] * fc[1];
@@ -231,6 +235,16 @@ function frequencyScale(z, p, k, fc, bt, opt) {
     z = bandTransform(z, ww);
     p = bandTransform(p, ww);
     for (let n = 0; n < num_inf; n++) z.push([0,0]); // Move zeros from infinity to zero.
+  } else if (bt == 'S') {
+    let ww = fc[0] * fc[1];
+    let b = fc[1] - fc[0];
+    let num_inf = p.length - z.length;
+    [z, p, k] = hpscale(z, p, k, b/2);
+    z = bandTransform(z, ww);
+    p = bandTransform(p, ww);
+    let wo = Math.sqrt(ww);
+    for (let n = 0; n < num_inf; n++) z.push([0, wo]); // Move zeros from infinity to jwo.
+    for (let n = 0; n < num_inf; n++) z.push([0,-wo]); // Move zeros from infinity to -jwo.
   } else {
     // Lowpass default.
     [z, p, k] = lpscale(z, p, k, fc);

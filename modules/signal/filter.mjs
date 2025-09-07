@@ -143,6 +143,15 @@ function complexMult(a, b) {
   return [a[0]*b[0] - a[1]*b[1], a[0]*b[1] + a[1]*b[0]];
 }
 
+function complexSqrt(a) {
+  // Conver to polar and divide angle by two
+  let r = Math.sqrt(a[0]**2 + a[1]**2);
+  let angle = Math.atan2(a[1], a[0]);
+  r = Math.sqrt(r);
+  angle = angle / 2;
+  return [r * Math.cos(angle), r * Math.sin(angle)];
+}
+
 function findR(N, L) {
   let xi_min = 1 + Number.EPSILON;
   let xi = xi_min;
@@ -177,7 +186,28 @@ function frequencyScale(z, p, k, fc, bt, opt) {
   if (bt.length == 0) bt = 'L';
   else bt = bt[0];
 
-  if (opt.digital) fc = preWarp(fc); // TODO: handle two frequencies for bandpas / bandstop
+  if (opt.digital) {
+    if (fc.constructor === Array) fc = fc.map((v) => preWarp(v));
+    else fc = preWarp(fc);
+  }
+
+  function bandTransform (r, ww) {
+    let ret = [];
+    r.forEach((v) => {
+      let rr = complexMult(v,v);
+      let sq = complexSqrt([rr[0] - ww, rr[1]]);
+      ret.push([v[0]+sq[0], v[1]+sq[1]]);
+      ret.push([v[0]-sq[0], v[1]-sq[1]]);
+    });
+    return ret;
+  }
+
+  function lpscale (z, p, k, fc) {
+    k = k * (fc ** (p.length - z.length));
+    z = z.map((v) => [fc * v[0], fc * v[1]]);
+    p = p.map((v) => [fc * v[0], fc * v[1]]);
+    return [z, p, k];
+  }
 
   // Scale zeros and poles
   if (bt == 'H') { // TODO: 'P' and 'S'
@@ -193,11 +223,17 @@ function frequencyScale(z, p, k, fc, bt, opt) {
     z = z.map((v) => complexDiv([fc, 0], v));
     p = p.map((v) => complexDiv([fc, 0], v));
     while (z.length < p.length) z.push([0,0]); // Move zeros from infinity to zero.
+  } else if (bt == 'P') {
+    let ww = fc[0] * fc[1];
+    let b = fc[1] - fc[0];
+    let num_inf = p.length - z.length;
+    [z, p, k] = lpscale(z, p, k, b/2);
+    z = bandTransform(z, ww);
+    p = bandTransform(p, ww);
+    for (let n = 0; n < num_inf; n++) z.push([0,0]); // Move zeros from infinity to zero.
   } else {
     // Lowpass default.
-    z = z.map((v) => [fc * v[0], fc * v[1]]);
-    p = p.map((v) => [fc * v[0], fc * v[1]]);
-    k = k * (fc ** (p.length - z.length));
+    [z, p, k] = lpscale(z, p, k, fc);
   }
 
   if (opt.digital) [z, p, k] = bzt(z, p, k);

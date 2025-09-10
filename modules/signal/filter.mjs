@@ -194,6 +194,8 @@ function frequencyScale(z, p, k, fc, bt, opt) {
   function bandTransform(r, ww) {
     let ret = [];
     r.forEach((v) => {
+      v[0] = v[0] / 2;
+      v[1] = v[1] / 2;
       let rr = complexMult(v,v);
       let sq = complexSqrt([rr[0] - ww, rr[1]]);
       ret.push([v[0]+sq[0], v[1]+sq[1]]);
@@ -224,14 +226,14 @@ function frequencyScale(z, p, k, fc, bt, opt) {
   }
 
   // Scale zeros and poles
-  if (bt == 'H') { // TODO: 'P' and 'S'
+  if (bt == 'H') {
     [z, p, k] = hpscale(z, p, k,fc);
     while (z.length < p.length) z.push([0,0]); // Move zeros from infinity to zero.
   } else if (bt == 'P') {
     let ww = fc[0] * fc[1];
     let b = fc[1] - fc[0];
     let num_inf = p.length - z.length;
-    [z, p, k] = lpscale(z, p, k, b/2);
+    [z, p, k] = lpscale(z, p, k, b);
     z = bandTransform(z, ww);
     p = bandTransform(p, ww);
     for (let n = 0; n < num_inf; n++) z.push([0,0]); // Move zeros from infinity to zero.
@@ -239,7 +241,7 @@ function frequencyScale(z, p, k, fc, bt, opt) {
     let ww = fc[0] * fc[1];
     let b = fc[1] - fc[0];
     let num_inf = p.length - z.length;
-    [z, p, k] = hpscale(z, p, k, b/2);
+    [z, p, k] = hpscale(z, p, k, b);
     z = bandTransform(z, ww);
     p = bandTransform(p, ww);
     let wo = Math.sqrt(ww);
@@ -256,69 +258,52 @@ function frequencyScale(z, p, k, fc, bt, opt) {
   return [z, p, k];
 }
 
+function pair2quadratic(a,b) {
+  //   real( (s - a)(s - b) ) = ss - s * real(a+b) + real(ab)
+  let p1 = -a[0] - b[0];
+  let p2 = a[0] * b[0] - a[1] * b[1]; // Real part of complex multiply
+  return [1, p1, p2];
+}
+
+function pairConjugates(arr) {
+  arr.sort((a,b) => {
+      return a[1] - b[1];
+  });
+
+  let odd = arr.length % 2;
+  let N = (arr.length - odd) / 2;
+
+  let ret = [];
+  for (let n = 0; n < N; n++) {
+    ret.push(arr[n]);
+    ret.push(arr[arr.length-n-1]);
+  }
+  if (odd) ret.push(arr[N]);
+  for (let n = 0; n < arr.length; n++) arr[n] = ret[n];
+}
+
 function preWarp(f) {
   return 2 * Math.tan(Math.PI * f * 0.5);
 }
 
-function sort(r) {
-  // If odd number of roots put real root last.
-  if ((r.length % 2) == 0) return r
+function zpk2sos(z, p, k) {
+  pairConjugates(z);
+  pairConjugates(p);
+  if (z.length % 2) z.push([0,0]);
+  if (p.length % 2) p.push([0,0]);
+  while (z.length < p.length) z.push([0,0]);
+  while (p.length < z.length) p.push([0,0]);
 
-  // Find root with smallest absolute imaginary.
-  let min = Math.abs(r[0][1]);
-  let im = 0;
-  for (let n = 0; n < r.length; n++) {
-    let val = Math.abs(r[n][1]);
-    if (val < min) {
-      min = val;
-      im = n;
-    }
-  }
-
-  let ret = [];
-  for (let n = 0; n < r.length; n++) {
-    if (n != im) ret.push(r[n]);
-  }
-  ret.push(r[im]);
-
-  return ret;
-}
-
-function zpk2sos(z,p,k) {
-
-  // Create unity SOS array.
   let sos = [];
-  while ((sos.length * 2) < z.length) sos.push([1, 0, 0, 1, 0, 0]);
-  while ((sos.length * 2) < p.length) sos.push([1, 0, 0, 1, 0, 0]);
-
-  // Sort roots
-  z = sort(z);
-  p = sort(p);
-
-  // Modify sections for zeros
-  let N = z.length;
-  let odd = N % 2;
-  let Npairs = (N - odd) / 2;
-  for (let n = 0; n < Npairs; n++) {
-    sos[n][1] = -2 * z[n][0];
-    sos[n][2] = (z[n][0] ** 2) + (z[n][1] ** 2);
+  for (let n = 0; n < z.length; n+=2) {
+    let zq = pair2quadratic(z[n], z[n+1]);
+    let pq = pair2quadratic(p[n], p[n+1]);
+    sos.push([...zq, ...pq]);
   }
-  if(odd) sos[Npairs][1] = -z[Npairs*2][0];
 
-  // Modify sections for poles
-  N = p.length;
-  odd = N % 2;
-  Npairs = (N - odd) / 2;
-  for (let n = 0; n < Npairs; n++) {
-    sos[n][4] = -2 * p[n][0];
-    sos[n][5] = (p[n][0] ** 2) + (p[n][1] ** 2);
-  }
-  if(odd) sos[Npairs][4] = -p[Npairs*2][0];
-
-  let l = sos.length - 1;
-  sos[l][0] *= k;
-  sos[l][1] *= k;
-  sos[l][2] *= k;
+  sos[0][0] *= k;
+  sos[0][1] *= k;
+  sos[0][2] *= k;
 
   return sos;
 }

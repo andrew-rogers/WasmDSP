@@ -8,6 +8,7 @@ export * from './Random'
 export * from './conv'
 export * from './filter'
 export * from './random'
+export * from './resample'
 export * from './sosfilt'
 
 export {b64, onWasm};

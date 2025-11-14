@@ -54,6 +54,11 @@ public:
         jsArrayWrite(m_id, Type::FLOAT32, ptr, cnt);
     }
 
+    void write(const double* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::FLOAT64, ptr, cnt);
+    }
+
     void write(const char* ptr, uint32_t cnt)
     {
         jsArrayWrite(m_id, Type::STRING, ptr, cnt);

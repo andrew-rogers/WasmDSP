@@ -155,6 +155,21 @@ WasmModule.prototype.setMemory = function(buffer) {
         U8:  {buf: mod.memUint8,   address_shift: 0},
         U32: {buf: mod.memUint32,  address_shift: 2}
     };
+
+    // Needs to match enum in JSArray.h
+    mod.memtypes = [
+        'STRING', // 0
+        'S8',     // 1
+        'U8',     // 2
+        'S16',    // 3
+        'U16',    // 4
+        'S32',    // 5
+        'U32',    // 6
+        'S64',    // 7
+        'U64',    // 8
+        'F32',    // 9
+        'F64'     // 10
+    ];
 };
 
 WasmModule.prototype.write = function( type, arr, address ) {
@@ -187,7 +202,8 @@ WasmModule.prototype._createImports = function() {
 
     env.jsArrayRead = function( id, type, ptr, index, cnt ) {
         const arr = that.scope.byId(id).slice(index, index+cnt);
-        that.write( 'F32', arr, ptr );
+        const type_name = that.module.memtypes[type];
+        that.write( type_name, arr, ptr );
         return arr.length;
     };
 
@@ -196,7 +212,8 @@ WasmModule.prototype._createImports = function() {
     };
 
     env.jsArrayWrite = function( id, type, ptr, cnt) {
-        const vals = that.read('F32', ptr, cnt);
+        const type_name = that.module.memtypes[type];
+        const vals = that.read(type_name, ptr, cnt);
         that.scope.byId(id).push(...vals);
     };
 

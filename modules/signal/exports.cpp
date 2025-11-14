@@ -37,6 +37,10 @@ extern "C" void sosfilt()
     size_t num_sections = sos.size() / 5U;
     float coeffs[num_sections * 5U];
     float state[num_sections * 2U];
+    for (size_t n = 0U; n < (num_sections * 2U); n++)
+    {
+        state[n] = 0.0F;
+    }
     size_t nr = sos.read(coeffs, num_sections * 5U);
 
     SOSFilt filt(num_sections, coeffs, state);

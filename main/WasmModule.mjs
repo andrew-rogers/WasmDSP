@@ -212,9 +212,14 @@ WasmModule.prototype._createImports = function() {
     };
 
     env.jsArrayWrite = function( id, type, ptr, cnt) {
-        const type_name = that.module.memtypes[type];
-        const vals = that.read(type_name, ptr, cnt);
-        that.scope.byId(id).push(...vals);
+        if (type == 0) {
+          // Write string as new member of array.
+          that.scope.byId(id).push(that.readString(ptr));
+        } else {
+          const type_name = that.module.memtypes[type];
+          const vals = that.read(type_name, ptr, cnt);
+          that.scope.byId(id).push(...vals);
+        }
     };
 
     env.jsEval = function( utf8_src ) {

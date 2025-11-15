@@ -49,6 +49,51 @@ public:
 
     int32_t size();
 
+    void write(const char* ptr)
+    {
+        jsArrayWrite(m_id, Type::STRING, ptr, 0U);
+    }
+
+    void write(const int8_t* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::INT8, ptr, cnt);
+    }
+
+    void write(const uint8_t* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::UINT8, ptr, cnt);
+    }
+
+    void write(const int16_t* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::INT16, ptr, cnt);
+    }
+
+    void write(const uint16_t* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::UINT16, ptr, cnt);
+    }
+
+    void write(const int32_t* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::INT32, ptr, cnt);
+    }
+
+    void write(const uint32_t* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::UINT32, ptr, cnt);
+    }
+
+    void write(const int64_t* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::INT64, ptr, cnt);
+    }
+
+    void write(const uint64_t* ptr, uint32_t cnt)
+    {
+        jsArrayWrite(m_id, Type::UINT64, ptr, cnt);
+    }
+
     void write(const float* ptr, uint32_t cnt)
     {
         jsArrayWrite(m_id, Type::FLOAT32, ptr, cnt);
@@ -59,10 +104,6 @@ public:
         jsArrayWrite(m_id, Type::FLOAT64, ptr, cnt);
     }
 
-    void write(const char* ptr, uint32_t cnt)
-    {
-        jsArrayWrite(m_id, Type::STRING, ptr, cnt);
-    }
 
 private:
     int32_t m_id;
